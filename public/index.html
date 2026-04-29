@@ -1,0 +1,30 @@
+<h2>Logowanie</h2>
+
+<input id="nick" placeholder="Nick"><br><br>
+<input id="haslo" type="password" placeholder="Hasło"><br><br>
+
+<button onclick="login()">Zaloguj</button>
+
+<p id="status"></p>
+
+<script>
+async function login() {
+    const res = await fetch("/login", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            nick: document.getElementById("nick").value,
+            haslo: document.getElementById("haslo").value
+        })
+    });
+
+    const data = await res.json();
+
+    if(data.success) {
+        localStorage.setItem("nick", document.getElementById("nick").value);
+        window.location.href = "panel.html";
+    } else {
+        document.getElementById("status").innerText = "Błędne dane";
+    }
+}
+</script>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Panel VMPK Kłosok</title>
+    <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+
+<div class="sidebar">
+    <h2>VMPK</h2>
+    <button onclick="showTab('home')">🏠 Strona główna</button>
+    <button onclick="showTab('grafik')">📆 Grafik</button>
+    <button onclick="showTab('admin')">🛠️ Admin</button>
+    <button onclick="logout()">🚪 Wyloguj</button>
+</div>
+
+<div class="content">
+
+    <div id="home" class="tab">
+        <h1>Siema kierowco! 👋</h1>
+        <p id="user"></p>
+    </div>
+
+    <div id="grafik" class="tab" style="display:none;">
+    <h1>Twój grafik 🚍</h1>
+
+    <p id="linia"></p>
+    <p id="zmiana"></p>
+
+    <img id="busImage" width="300">
+</div>
+
+<div id="admin" class="tab" style="display:none;">
+    <h1>Panel Admina 🛠️</h1>
+
+    <input id="adminNick" placeholder="Nick"><br><br>
+    <input id="adminLinia" placeholder="Linia"><br><br>
+    <input id="adminZmiana" placeholder="Zmiana (A | B | C)"><br><br>
+    <input id="adminBus" placeholder="Autobus (np. 003)"><br><br>
+
+    <button onclick="zapiszGrafik()">Zapisz grafik</button>
+
+    <p id="adminStatus"></p>
+</div>
+
+</div>
+
+<script src="panel.js"></script>
+
+</body>
+</html>
