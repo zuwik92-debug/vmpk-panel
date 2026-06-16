@@ -25,12 +25,6 @@
             border: none;
             cursor: pointer;
         }
-        .admin-section {
-            margin-top: 40px;
-            padding: 20px;
-            border: 1px dashed #555;
-            max-width: 400px;
-        }
     </style>
 </head>
 <body>
@@ -52,14 +46,6 @@
     <button onclick="zapiszGrafik()">Zapisz Grafik</button>
     <p id="status"></p>
 
-    <div id="admin-panel" class="admin-section" style="display: none;">
-        <h3>Zmień zdjęcie na ekranie logowania</h3>
-        <br>
-        <input type="file" id="file-input" accept="image/*">
-        <button onclick="wyslijZdjecie()" style="background-color: #28a745;">Wgraj zdjęcie 📷</button>
-        <p id="upload-status" style="margin-top:10px;"></p>
-    </div>
-
     <br><br>
     <button onclick="wyloguj()" style="background-color: #dc3545;">Wyloguj się</button>
 
@@ -69,11 +55,6 @@
             window.location.href = "index.html";
         } else {
             document.getElementById("user-display").innerText = zalogowany;
-            
-            // Jeśli zalogował się admin, pokazujemy ukryty przycisk do wgrywania plików
-            if(zalogowany === "admin") {
-                document.getElementById("admin-panel").style.display = "block";
-            }
         }
 
         async function zapiszGrafik() {
@@ -91,43 +72,6 @@
             const data = await res.json();
             if(data.success) {
                 document.getElementById("status").innerText = "Zapisano pomyślnie!";
-            }
-        }
-
-        // FUNKCJA DO WYSYŁANIA PLIKU ZDJĘCIA NA SERWER
-        async function wyslijZdjecie() {
-            const fileInput = document.getElementById("file-input");
-            const uploadStatus = document.getElementById("upload-status");
-
-            if(fileInput.files.length === 0) {
-                uploadStatus.innerText = "Wybierz najpierw plik graficzny!";
-                uploadStatus.style.color = "#ff6b6b";
-                return;
-            }
-
-            uploadStatus.innerText = "Wysyłanie pliku...";
-            uploadStatus.style.color = "#white";
-
-            const formData = new FormData();
-            formData.append("tlo", fileInput.files[0]);
-
-            try {
-                const res = await fetch("/upload-bg", {
-                    method: "POST",
-                    body: formData
-                });
-                const data = await res.json();
-
-                if(data.success) {
-                    uploadStatus.innerText = "Zdjęcie zmienione pomyślnie! Odśwież stronę logowania.";
-                    uploadStatus.style.color = "#2be45c";
-                } else {
-                    uploadStatus.innerText = "Błąd: " + data.message;
-                    uploadStatus.style.color = "#ff6b6b";
-                }
-            } catch (e) {
-                uploadStatus.innerText = "Błąd sieci podczas wysyłania.";
-                uploadStatus.style.color = "#ff6b6b";
             }
         }
 
