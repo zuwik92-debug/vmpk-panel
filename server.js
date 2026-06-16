@@ -1,13 +1,10 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const fileUpload = require("express-fileupload");
-const path = require("path");
 
 const app = express();
 
 app.use(express.json());
 app.use(express.static("public"));
-app.use(fileUpload()); // 🔥 Włączamy obsługę wgrywania plików
 
 const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/vztm";
 
@@ -52,24 +49,6 @@ app.post("/login", async (req, res) => {
     } else {
         res.json({ success: false });
     }
-});
-
-// 🖼️ WGLEDNY ENDPOINT DO AP-LOUDU ZDJĘCIA (Zapisuje jako public/tlo.jpg)
-app.post("/upload-bg", (req, res) => {
-    if (!req.files || Object.keys(req.files).length === 0) {
-        return res.status(400).json({ success: false, message: "Nie wybrano pliku." });
-    }
-
-    const tloPlik = req.files.tlo;
-    const sciezkaZapisu = path.join(__dirname, "public", "tlo.jpg");
-
-    tloPlik.mv(sciezkaZapisu, (err) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ success: false, message: "Błąd zapisu pliku." });
-        }
-        res.json({ success: true });
-    });
 });
 
 // 📊 POBIERZ GRAFIK
