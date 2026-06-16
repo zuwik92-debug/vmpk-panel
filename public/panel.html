@@ -3,296 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Zarządzania Grafikami</title>
+    <title>Panel Kierowcy</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
         body {
             background-color: #121212;
             color: white;
-            padding: 40px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+            font-family: sans-serif;
+            padding: 20px;
         }
-
-        .panel-container {
-            width: 100%;
-            max-width: 600px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            margin-bottom: 30px;
-        }
-
-        h2, h3 {
-            font-weight: 400;
-            letter-spacing: 1px;
-            margin-bottom: 20px;
-        }
-
-        h2 {
-            font-size: 2rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 15px;
-        }
-
-        h3 {
-            font-size: 1.4rem;
-            color: #e0e0e0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .input-group {
-            margin-bottom: 18px;
-        }
-
-        .input-group label {
+        input, select {
             display: block;
-            margin-bottom: 6px;
-            font-size: 14px;
-            color: #ccc;
-        }
-
-        .input-group input, .input-group select {
+            margin: 10px 0;
+            padding: 10px;
             width: 100%;
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 6px;
-            color: white;
-            font-size: 16px;
-            outline: none;
-            transition: 0.3s;
+            max-width: 300px;
         }
-
-        .input-group input:focus, .input-group select:focus {
-            border-color: rgba(255, 255, 255, 0.5);
-            background: rgba(0, 0, 0, 0.4);
-        }
-
         button {
-            width: 100%;
-            padding: 14px;
-            font-size: 15px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-radius: 6px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
             cursor: pointer;
-            transition: 0.3s;
-            margin-top: 10px;
         }
-
-        .btn-save {
-            background: #007bff;
-            border: 1px solid #0056b3;
-            color: white;
-        }
-
-        .btn-save:hover {
-            background: #0056b3;
-        }
-
-        .btn-logout {
-            background: transparent;
-            border: 1px solid #dc3545;
-            color: #dc3545;
-            margin-top: 20px;
-        }
-
-        .btn-logout:hover {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-admin-save {
-            background: #28a745;
-            border: 1px solid #218838;
-            color: white;
-        }
-
-        .btn-admin-save:hover {
-            background: #218838;
-        }
-
-        /* Sekcja admina */
-        .admin-panel {
-            width: 100%;
-            max-width: 600px;
-            background: rgba(40, 167, 69, 0.05);
-            border: 1px solid rgba(40, 167, 69, 0.2);
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
-        }
-
-        .status-msg {
-            margin-top: 12px;
-            font-size: 14px;
-            font-weight: 500;
+        .admin-section {
+            margin-top: 40px;
+            padding: 20px;
+            border: 1px dashed #555;
+            max-width: 400px;
         }
     </style>
 </head>
 <body>
 
-    <div class="panel-container">
-        <h2>Panel Kierowcy</h2>
-        <p style="margin-bottom: 20px; color: #aaa;">Zalogowany jako: <b id="user-display" style="color: #fff;">-</b></p>
+    <h2>Zarządzanie Grafikami</h2>
+    <p>Zalogowano jako: <b id="user-display"></b></p>
 
-        <div class="input-group">
-            <label>Nick kierowcy:</label>
-            <input type="text" id="kierowca-nick" placeholder="Wpisz nick kierowcy...">
-        </div>
+    <input type="text" id="kierowca-nick" placeholder="Nick kierowcy">
+    <input type="text" id="kierowca-linia" placeholder="Linia">
+    
+    <select id="kierowca-zmiana">
+        <option value="A">Zmiana A</option>
+        <option value="B">Zmiana B</option>
+        <option value="C">Zmiana C</option>
+    </select>
 
-        <div class="input-group">
-            <label>Linia:</label>
-            <input type="text" id="kierowca-linia" placeholder="Np. 63, 107...">
-        </div>
+    <input type="text" id="kierowca-autobus" placeholder="Numer taborowy">
 
-        <div class="input-group">
-            <label>Zmiana:</label>
-            <select id="kierowca-zmiana">
-                <option value="A">Zmiana A (Poranna)</option>
-                <option value="B">Zmiana B (Popołudniowa)</option>
-                <option value="C">Zmiana C (Nocna)</option>
-            </select>
-        </div>
+    <button onclick="zapiszGrafik()">Zapisz Grafik</button>
+    <p id="status"></p>
 
-        <div class="input-group">
-            <label>Numer taborowy autobusu:</label>
-            <input type="text" id="kierowca-autobus" placeholder="Np. 1119...">
-        </div>
-
-        <button class="btn-save" onclick="zapiszGrafik()">Zapisz Grafik 💾</button>
-        <p id="main-status" class="status-msg"></p>
-
-        <button class="btn-logout" onclick="wyloguj()">Wyloguj się 🚪</button>
+    <div id="admin-panel" class="admin-section" style="display: none;">
+        <h3>Zmień zdjęcie na ekranie logowania</h3>
+        <br>
+        <input type="file" id="file-input" accept="image/*">
+        <button onclick="wyslijZdjecie()" style="background-color: #28a745;">Wgraj zdjęcie 📷</button>
+        <p id="upload-status" style="margin-top:10px;"></p>
     </div>
 
-
-    <div id="admin-bg-panel" class="admin-panel" style="display: none;">
-        <h3>⚙️ Zarządzanie Tłem Ekranu Logowania</h3>
-        <p style="font-size: 13px; color: #ccc; margin: 5px 0 20px 0;">
-            Wklej bezpośredni link do zdjęcia autobusu (np. z Imgura lub Discorda). Zdjęcie automatycznie ustawi się jako tło na stronie logowania.
-        </p>
-        
-        <div class="input-group">
-            <label>Link do zdjęcia tła (URL):</label>
-            <input type="text" id="new-bg-url" placeholder="https://i.imgur.com/your-image.jpg">
-        </div>
-        
-        <button class="btn-admin-save" onclick="zmienTloZPanelu()">Zapisz nowe tło 🖼️</button>
-        <p id="bg-status" class="status-msg"></p>
-    </div>
-
+    <br><br>
+    <button onclick="wyloguj()" style="background-color: #dc3545;">Wyloguj się</button>
 
     <script>
-        // Przy uruchomieniu strony sprawdzamy sesję użytkownika
-        const zalogowanyNick = localStorage.getItem("nick");
-        const rola = localStorage.getItem("role");
-
-        if (!zalogowanyNick) {
-            // Jeśli ktoś wejdzie bez logowania, cofnij go do strony głównej
+        const zalogowany = localStorage.getItem("nick");
+        if(!zalogowany) {
             window.location.href = "index.html";
         } else {
-            document.getElementById("user-display").innerText = zalogowanyNick;
+            document.getElementById("user-display").innerText = zalogowany;
             
-            // JEŚLI ZALOGOWANY TO ADMIN -> POKAŻ UKRYTY PANEL TŁA
-            if (rola === "admin" || zalogowanyNick === "admin") {
-                document.getElementById("admin-bg-panel").style.display = "block";
-                
-                // Pobieramy aktualne tło z bazy, żeby wkleić je do inputa na start
-                fetch("/api/get-bg")
-                    .then(res => res.json())
-                    .then(data => {
-                        if(data.url) document.getElementById("new-bg-url").value = data.url;
-                    })
-                    .catch(e => console.error("Błąd ładowania aktualnego tła:", e));
+            // Jeśli zalogował się admin, pokazujemy ukryty przycisk do wgrywania plików
+            if(zalogowany === "admin") {
+                document.getElementById("admin-panel").style.display = "block";
             }
         }
 
-        // FUNKCJA ZAPISU GRAFIKU KIEROWCY
         async function zapiszGrafik() {
             const nick = document.getElementById("kierowca-nick").value;
             const linia = document.getElementById("kierowca-linia").value;
             const zmiana = document.getElementById("kierowca-zmiana").value;
             const autobus = document.getElementById("kierowca-autobus").value;
-            const status = document.getElementById("main-status");
 
-            if(!nick || !linia || !autobus) {
-                status.style.color = "#ff6b6b";
-                status.innerText = "Wypełnij nick, linię oraz autobus!";
-                return;
-            }
+            const res = await fetch("/grafik", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nick, linia, zmiana, autobus })
+            });
 
-            try {
-                const res = await fetch("/grafik", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ nick, linia, zmiana, autobus })
-                });
-                const data = await res.json();
-                
-                if(data.success) {
-                    status.style.color = "#2be45c";
-                    status.innerText = `Pomyślnie zapisano grafik dla kierowcy: ${nick}!`;
-                } else {
-                    status.style.color = "#ff6b6b";
-                    status.innerText = "Wystąpił błąd podczas zapisu grafiku.";
-                }
-            } catch (error) {
-                status.style.color = "#ff6b6b";
-                status.innerText = "Błąd połączenia z serwerem.";
+            const data = await res.json();
+            if(data.success) {
+                document.getElementById("status").innerText = "Zapisano pomyślnie!";
             }
         }
 
-        // FUNKCJA DLA ADMINA - ZMIANA LINKU DO TŁA W BAZIE
-        async function zmienTloZPanelu() {
-            const url = document.getElementById("new-bg-url").value;
-            const status = document.getElementById("bg-status");
+        // FUNKCJA DO WYSYŁANIA PLIKU ZDJĘCIA NA SERWER
+        async function wyslijZdjecie() {
+            const fileInput = document.getElementById("file-input");
+            const uploadStatus = document.getElementById("upload-status");
 
-            if(!url) {
-                status.style.color = "#ff6b6b";
-                status.innerText = "Wklej poprawny link URL do zdjęcia!";
+            if(fileInput.files.length === 0) {
+                uploadStatus.innerText = "Wybierz najpierw plik graficzny!";
+                uploadStatus.style.color = "#ff6b6b";
                 return;
             }
 
-            status.style.color = "#aaa";
-            status.innerText = "Zapisywanie tła w bazie...";
+            uploadStatus.innerText = "Wysyłanie pliku...";
+            uploadStatus.style.color = "#white";
+
+            const formData = new FormData();
+            formData.append("tlo", fileInput.files[0]);
 
             try {
-                const res = await fetch("/api/set-bg", {
+                const res = await fetch("/upload-bg", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ url })
+                    body: formData
                 });
-
                 const data = await res.json();
+
                 if(data.success) {
-                    status.style.color = "#2be45c";
-                    status.innerText = "Tło zostało pomyślnie zmienione! Możesz odświeżyć ekran logowania.";
+                    uploadStatus.innerText = "Zdjęcie zmienione pomyślnie! Odśwież stronę logowania.";
+                    uploadStatus.style.color = "#2be45c";
                 } else {
-                    status.style.color = "#ff6b6b";
-                    status.innerText = "Serwer odrzucił zapis zdjęcia.";
+                    uploadStatus.innerText = "Błąd: " + data.message;
+                    uploadStatus.style.color = "#ff6b6b";
                 }
-            } catch (error) {
-                status.style.color = "#ff6b6b";
-                status.innerText = "Błąd sieci podczas zmiany tła.";
+            } catch (e) {
+                uploadStatus.innerText = "Błąd sieci podczas wysyłania.";
+                uploadStatus.style.color = "#ff6b6b";
             }
         }
 
-        // WYLOGOWANIE
         function wyloguj() {
             localStorage.clear();
             window.location.href = "index.html";
