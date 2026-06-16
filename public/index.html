@@ -24,60 +24,35 @@
             width: 100%;
         }
 
-        /* Lewa strona - zdjęcie autobusu */
+        /* Lewa strona - Zdjęcie autobusu na pół ekranu */
         .left-side {
-            flex: 1.2;
+            flex: 1;
+            background-image: url('tlo.jpg');
             background-size: cover;
             background-position: center;
-            position: relative;
-            transition: background-image 0.5s ease;
+            background-color: #121212;
         }
 
-        .watermark {
-            position: absolute;
-            bottom: 15px;
-            left: 15px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 12px;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
-        }
-
-        /* Prawa strona - rozmyty formularz */
+        /* Prawa strona - Logowanie do panelu */
         .right-side {
-            flex: 0.8;
-            background-size: cover;
-            background-position: center;
-            position: relative;
+            flex: 1;
+            background-color: #1a1a1a;
             display: flex;
             justify-content: center;
             align-items: center;
-        }
-
-        /* Efekt blur na tło po prawej stronie */
-        .right-side::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-image: inherit;
-            background-size: cover;
-            background-position: center;
-            filter: blur(15px) brightness(0.4);
-            z-index: 1;
+            padding: 40px;
         }
 
         .login-box {
-            position: relative;
-            z-index: 2;
-            width: 80%;
+            width: 100%;
             max-width: 400px;
             color: white;
         }
 
         h2 {
             font-size: 2.5rem;
-            margin-bottom: 2.5rem;
+            margin-bottom: 2rem;
             font-weight: 400;
-            letter-spacing: 1px;
         }
 
         .input-group {
@@ -88,30 +63,23 @@
             display: block;
             margin-bottom: 0.5rem;
             font-size: 14px;
-            color: #ddd;
+            color: #aaa;
         }
 
         .input-group input {
             width: 100%;
             padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 6px;
             color: white;
             font-size: 16px;
             outline: none;
-            transition: 0.3s;
-        }
-
-        .input-group input:focus {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.5);
         }
 
         .actions {
             display: flex;
             align-items: center;
-            justify-content: flex-start;
             gap: 20px;
             margin-top: 2rem;
         }
@@ -125,13 +93,6 @@
             text-transform: uppercase;
             border-radius: 4px;
             cursor: pointer;
-            transition: 0.3s;
-            letter-spacing: 1px;
-        }
-
-        .btn-login:hover {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.6);
         }
 
         .forgot-pass {
@@ -143,30 +104,18 @@
             opacity: 0.8;
         }
 
-        .forgot-pass:hover {
-            opacity: 1;
-        }
-
         #status {
             margin-top: 15px;
             color: #ff6b6b;
             font-size: 14px;
-        }
-
-        @media (max-width: 768px) {
-            .left-side { display: none; }
-            .right-side { flex: 1; }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="left-side" id="bg-left">
-            <div class="watermark">© [MT-100] marcel711</div>
-        </div>
-
-        <div class="right-side" id="bg-right">
+        <div class="left-side"></div>
+        <div class="right-side">
             <div class="login-box">
                 <h2>Logowanie do panelu</h2>
                 
@@ -191,21 +140,6 @@
     </div>
 
     <script>
-        // Pobieranie dynamicznego tła z bazy danych przy starcie strony
-        async function zaladujTlo() {
-            try {
-                const res = await fetch("/api/get-bg");
-                const data = await res.json();
-                if(data.url) {
-                    document.getElementById('bg-left').style.backgroundImage = `url('${data.url}')`;
-                    document.getElementById('bg-right').style.backgroundImage = `url('${data.url}')`;
-                }
-            } catch(e) {
-                console.error("Błąd pobierania tła:", e);
-            }
-        }
-        zaladujTlo();
-
         async function login() {
             const nick = document.getElementById("nick").value;
             const haslo = document.getElementById("haslo").value;
@@ -215,8 +149,6 @@
                 status.innerText = "Uzupełnij wszystkie pola!";
                 return;
             }
-
-            status.innerText = "Logowanie...";
 
             const res = await fetch("/login", {
                 method: "POST",
@@ -228,7 +160,6 @@
 
             if (data.success) {
                 localStorage.setItem("nick", nick);
-                localStorage.setItem("role", data.role); // zapisujemy rolę (admin/user)
                 window.location.href = "panel.html";
             } else {
                 status.innerText = "Błędny nick lub hasło!";
