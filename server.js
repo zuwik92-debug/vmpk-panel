@@ -3,23 +3,16 @@ const mongoose = require("mongoose");
 
 const app = express();
 
-// 🔥 Obsługa formatu JSON (wymagane do komunikacji z frontendem)
 app.use(express.json());
-
-// 📁 Serwowanie plików statycznych strony (HTML, CSS, JS z folderu public)
 app.use(express.static("public"));
 
-
-// 🔌 Połączenie z bazą danych
-// Pobiera adres ze zmiennej MONGO_URI na Renderze. Jeśli jej nie ma (lokalnie), łączy z localhost.
 const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/vztm";
 
 mongoose.connect(MONGO_URI)
     .then(() => console.log("Połączono z MongoDB! 🔌"))
     .catch(err => console.error("Błąd połączenia z bazą danych:", err));
 
-
-// 👤 MODEL UŻYTKOWNIKA (Struktura danych w bazie)
+// 👤 MODEL USERA
 const User = mongoose.model("User", {
     nick: String,
     haslo: String,
@@ -29,46 +22,67 @@ const User = mongoose.model("User", {
     role: String
 });
 
+// 🖼️ MODEL USTAWIEŃ (Dla dynamicznego tła)
+const Settings = mongoose.model("Settings", {
+    key: String,
+    value: String
+});
 
-// 🧪 Funkcja tworząca konto administratora (uruchamia się tylko raz przy starcie, jeśli nie istnieje)
-async function createTestUser() {
+// 🧪 tworzy admina i domyślne tło
+async function initDatabase() {
     try {
         const istnieje = await User.findOne({ nick: "admin" });
-
         if (!istnieje) {
             await User.create({
                 nick: "admin",
                 haslo: "1234",
                 role: "admin"
             });
-            console.log("Admin utworzony domyślnie: admin / 1234");
+            console.log("Admin utworzony: admin / 1234");
+        }
+
+        // Domyślne tło, dopóki nie wrzucisz swojego
+        const tloIstnieje = await Settings.findOne({ key: "bg_image" });
+        if (!tloIstnieje) {
+            await Settings.create({
+                key: "bg_image",
+                value: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=1000"
+            });
         }
     } catch (error) {
-        console.error("Błąd podczas sprawdzania/tworzenia admina:", error);
+        console.error("Błąd podczas inicjalizacji bazy:", error);
     }
 }
 
-
-// 🔐 LOGOWANIE
+// 🔐 LOGIN
 app.post("/login", async (req, res) => {
     const { nick, haslo } = req.body;
-
     const user = await User.findOne({ nick, haslo });
 
     if(user) {
-        res.json({ success: true });
+        res.json({ success: true, role: user.role || "user" });
     } else {
         res.json({ success: false });
     }
 });
 
+// 🖼️ POBIERZ AKTUALNE TŁO
+app.get("/api/get-bg", async (req, res) => {
+    const bg = await Settings.findOne({ key: "bg_image" });
+    res.json({ url: bg ? bg.value : "" });
+});
 
-// 📊 POBIERANIE GRAFIKU DLA UŻYTKOWNIKA
+// 🛠️ ZMIANA TŁA (Tylko dla admina)
+app.post("/api/set-bg", async (req, res) => {
+    const { url } = req.body;
+    await Settings.findOneAndUpdate({ key: "bg_image" }, { value: url }, { upsert: true });
+    res.json({ success: true });
+});
+
+// 📊 POBIERZ GRAFIK
 app.get("/grafik/:nick", async (req, res) => {
     const user = await User.findOne({ nick: req.params.nick });
-
     if(!user) return res.json(null);
-
     res.json({
         linia: user.linia,
         zmiana: user.zmiana,
@@ -76,16 +90,11 @@ app.get("/grafik/:nick", async (req, res) => {
     });
 });
 
-
-// 🛠️ ZAPIS I AKTUALIZACJA GRAFIKU
+// 🛠️ ZAPIS GRAFIKU
 app.post("/grafik", async (req, res) => {
-    console.log("Otrzymane dane (BODY):", req.body); // 🔍 debugowanie w konsoli
-
     const { nick, linia, zmiana, autobus } = req.body;
-
     let user = await User.findOne({ nick });
 
-    // Jeśli użytkownik nie istnieje w bazie, utwórz go z domyślnym hasłem
     if(!user) {
         user = new User({ nick, haslo: "1234" });
     }
@@ -95,16 +104,11 @@ app.post("/grafik", async (req, res) => {
     user.autobus = autobus;
 
     await user.save();
-
     res.json({ success: true });
 });
 
-
-// 🚀 START SERWERA
-// Dynamiczny port przydzielany przez hosting Render lub domyślny port 3000 do testów lokalnych
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, async () => {
-    console.log(`Serwer działa poprawnie na porcie: ${PORT} 🔥`);
-    await createTestUser();
+    console.log(`Serwer działa 🔥 Port: ${PORT}`);
+    await initDatabase();
 });
