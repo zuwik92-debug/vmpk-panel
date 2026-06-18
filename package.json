@@ -1,20 +1,12 @@
 {
   "name": "vmpk-panel",
   "version": "1.0.0",
-  "description": "Pierwsza wersja panelu",
+  "description": "Panel kierowcy VMPK",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
-<<<<<<< HEAD
- "dependencies": {
-    "express": "^4.18.2",
-    "express-fileupload": "^1.4.3",
-    "mongoose": "^8.0.0"
-=======
   "dependencies": {
-    "express": "^4.19.2",
-    "mongoose": "^8.3.1"
->>>>>>> f3eed8701a09cc7b9eaa5d09b36612523b35b01d
+    "express": "^4.19.2"
   }
 }
