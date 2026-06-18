@@ -3,16 +3,14 @@ const mongoose = require("mongoose");
 
 const app = express();
 
-// 🔥 TO MUSI BYĆ (obsługa JSON)
 app.use(express.json());
-
-// 📁 pliki strony
 app.use(express.static("public"));
 
+const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/vztm";
 
-// 🔌 połączenie z bazą
-mongoose.connect("mongodb://127.0.0.1:27017/vztm");
-
+mongoose.connect(MONGO_URI)
+    .then(() => console.log("Połączono z MongoDB! 🔌"))
+    .catch(err => console.error("Błąd połączenia z bazą danych:", err));
 
 // 👤 MODEL USERA
 const User = mongoose.model("User", {
@@ -24,26 +22,26 @@ const User = mongoose.model("User", {
     role: String
 });
 
-
 // 🧪 tworzy admina (tylko raz)
 async function createTestUser() {
-    const istnieje = await User.findOne({ nick: "admin" });
-
-    if (!istnieje) {
-        await User.create({
-            nick: "admin",
-            haslo: "1234",
-            role: "admin"
-        });
-        console.log("Admin utworzony: admin / 1234");
+    try {
+        const istnieje = await User.findOne({ nick: "admin" });
+        if (!istnieje) {
+            await User.create({
+                nick: "admin",
+                haslo: "1234",
+                role: "admin"
+            });
+            console.log("Admin utworzony: admin / 1234");
+        }
+    } catch (error) {
+        console.error("Błąd podczas tworzenia admina:", error);
     }
 }
 
-
-// 🔐 LOGIN (z bazy)
+// 🔐 LOGIN
 app.post("/login", async (req, res) => {
     const { nick, haslo } = req.body;
-
     const user = await User.findOne({ nick, haslo });
 
     if(user) {
@@ -53,13 +51,10 @@ app.post("/login", async (req, res) => {
     }
 });
 
-
 // 📊 POBIERZ GRAFIK
 app.get("/grafik/:nick", async (req, res) => {
     const user = await User.findOne({ nick: req.params.nick });
-
     if(!user) return res.json(null);
-
     res.json({
         linia: user.linia,
         zmiana: user.zmiana,
@@ -67,13 +62,9 @@ app.get("/grafik/:nick", async (req, res) => {
     });
 });
 
-
 // 🛠️ ZAPIS GRAFIKU
 app.post("/grafik", async (req, res) => {
-    console.log("BODY:", req.body); // 🔍 debug
-
     const { nick, linia, zmiana, autobus } = req.body;
-
     let user = await User.findOne({ nick });
 
     if(!user) {
@@ -85,13 +76,11 @@ app.post("/grafik", async (req, res) => {
     user.autobus = autobus;
 
     await user.save();
-
     res.json({ success: true });
 });
 
-
-// 🚀 START SERWERA
-app.listen(3000, async () => {
-    console.log("Serwer działa 🔥 http://localhost:3000");
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, async () => {
+    console.log(`Serwer działa 🔥 Port: ${PORT}`);
     await createTestUser();
 });

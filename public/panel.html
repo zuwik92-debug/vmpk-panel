@@ -1,51 +1,84 @@
 <!DOCTYPE html>
-<html>
+<html lang="pl">
 <head>
-    <title>Panel VMPK Kłosok</title>
-    <link rel="stylesheet" href="panel.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Kierowcy</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: white;
+            font-family: sans-serif;
+            padding: 20px;
+        }
+        input, select {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            max-width: 300px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 
-<div class="sidebar">
-    <h2>VMPK</h2>
-    <button onclick="showTab('home')">🏠 Strona główna</button>
-    <button onclick="showTab('grafik')">📆 Grafik</button>
-    <button onclick="showTab('admin')">🛠️ Admin</button>
-    <button onclick="logout()">🚪 Wyloguj</button>
-</div>
+    <h2>Zarządzanie Grafikami</h2>
+    <p>Zalogowano jako: <b id="user-display"></b></p>
 
-<div class="content">
+    <input type="text" id="kierowca-nick" placeholder="Nick kierowcy">
+    <input type="text" id="kierowca-linia" placeholder="Linia">
+    
+    <select id="kierowca-zmiana">
+        <option value="A">Zmiana A</option>
+        <option value="B">Zmiana B</option>
+        <option value="C">Zmiana C</option>
+    </select>
 
-    <div id="home" class="tab">
-        <h1>Siema kierowco! 👋</h1>
-        <p id="user"></p>
-    </div>
+    <input type="text" id="kierowca-autobus" placeholder="Numer taborowy">
 
-    <div id="grafik" class="tab" style="display:none;">
-    <h1>Twój grafik 🚍</h1>
+    <button onclick="zapiszGrafik()">Zapisz Grafik</button>
+    <p id="status"></p>
 
-    <p id="linia"></p>
-    <p id="zmiana"></p>
+    <br><br>
+    <button onclick="wyloguj()" style="background-color: #dc3545;">Wyloguj się</button>
 
-    <img id="busImage" width="300">
-</div>
+    <script>
+        const zalogowany = localStorage.getItem("nick");
+        if(!zalogowany) {
+            window.location.href = "index.html";
+        } else {
+            document.getElementById("user-display").innerText = zalogowany;
+        }
 
-<div id="admin" class="tab" style="display:none;">
-    <h1>Panel Admina 🛠️</h1>
+        async function zapiszGrafik() {
+            const nick = document.getElementById("kierowca-nick").value;
+            const linia = document.getElementById("kierowca-linia").value;
+            const zmiana = document.getElementById("kierowca-zmiana").value;
+            const autobus = document.getElementById("kierowca-autobus").value;
 
-    <input id="adminNick" placeholder="Nick"><br><br>
-    <input id="adminLinia" placeholder="Linia"><br><br>
-    <input id="adminZmiana" placeholder="Zmiana (A | B | C)"><br><br>
-    <input id="adminBus" placeholder="Autobus (np. 003)"><br><br>
+            const res = await fetch("/grafik", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nick, linia, zmiana, autobus })
+            });
 
-    <button onclick="zapiszGrafik()">Zapisz grafik</button>
+            const data = await res.json();
+            if(data.success) {
+                document.getElementById("status").innerText = "Zapisano pomyślnie!";
+            }
+        }
 
-    <p id="adminStatus"></p>
-</div>
-
-</div>
-
-<script src="panel.js"></script>
-
+        function wyloguj() {
+            localStorage.clear();
+            window.location.href = "index.html";
+        }
+    </script>
 </body>
 </html>
