@@ -3,80 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Kierowcy</title>
+    <title>Panel Kierowcy - VMPK</title>
     <style>
-        body {
-            background-color: #121212;
-            color: white;
-            font-family: sans-serif;
-            padding: 20px;
+        /* Reset domyślnych stylów */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        input, select {
-            display: block;
-            margin: 10px 0;
-            padding: 10px;
+
+        html, body {
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background-color: #121212; /* Zapobiega mignięciu bieli */
+        }
+
+        /* Główny kontener */
+        .app-container {
+            display: flex;
             width: 100%;
-            max-width: 300px;
+            height: 100vh;
         }
-        button {
-            padding: 10px 20px;
-            background-color: #007bff;
+
+        /* PANEL BOCZNY (Sidebar) */
+        .sidebar {
+            width: 260px;
+            background-color: #161616;
             color: white;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            height: 100%;
+            flex-shrink: 0;
+            border-right: 1px solid #222;
+        }
+
+        .sidebar h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            padding-left: 10px;
+        }
+
+        .menu-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            list-style: none;
+        }
+
+        .menu-item button {
+            width: 100%;
+            background-color: #2a2a2a;
+            color: #ffffff;
             border: none;
+            padding: 12px 15px;
+            font-size: 14px;
+            text-align: left;
+            border-radius: 4px;
             cursor: pointer;
+            transition: background 0.2s;
+            font-weight: 500;
+        }
+
+        .menu-item button:hover {
+            background-color: #3a3a3a;
+        }
+
+        .menu-item button.btn-logout {
+            background-color: #4a2323;
+            color: #ff9999;
+            margin-top: 10px;
+        }
+
+        .menu-item button.btn-logout:hover {
+            background-color: #5c2b2b;
+            color: #ffffff;
+        }
+
+        /* GŁÓWNA TREŚĆ (Zmieniona z białej na ciemną!) */
+        .main-content {
+            flex-grow: 1;
+            background-color: #121212; /* Ciemne, komfortowe tło dla oczu */
+            padding: 50px;
+            overflow-y: auto;
+            color: #ffffff; /* Jasny tekst */
+        }
+
+        .main-content h2 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .main-content p {
+            font-size: 16px;
+            color: #aaaaaa;
+        }
+
+        #user-info {
+            font-weight: 600;
+            color: #ffffff;
         }
     </style>
 </head>
 <body>
 
-    <h2>Zarządzanie Grafikami</h2>
-    <p>Zalogowano jako: <b id="user-display"></b></p>
+    <div class="app-container">
+        
+        <aside class="sidebar">
+            <h1>VMPK</h1>
+            <ul class="menu-list">
+                <li class="menu-item"><button onclick="window.location.reload()">🏠 Strona główna</button></li>
+                <li class="menu-item"><button onclick="goToGrafik()">📅 Grafik</button></li>
+                <li class="menu-item"><button>🛠️ Admin</button></li>
+                <li class="menu-item"><button class="btn-logout" onclick="logout()">🚪 Wyloguj</button></li>
+            </ul>
+        </aside>
 
-    <input type="text" id="kierowca-nick" placeholder="Nick kierowcy">
-    <input type="text" id="kierowca-linia" placeholder="Linia">
-    
-    <select id="kierowca-zmiana">
-        <option value="A">Zmiana A</option>
-        <option value="B">Zmiana B</option>
-        <option value="C">Zmiana C</option>
-    </select>
+        <main class="main-content">
+            <h2>Siema kierowco! 👋</h2>
+            <p>Zalogowany jako: <span id="user-info">wczytywanie...</span></p>
+        </main>
 
-    <input type="text" id="kierowca-autobus" placeholder="Numer taborowy">
-
-    <button onclick="zapiszGrafik()">Zapisz Grafik</button>
-    <p id="status"></p>
-
-    <br><br>
-    <button onclick="wyloguj()" style="background-color: #dc3545;">Wyloguj się</button>
+    </div>
 
     <script>
-        const zalogowany = localStorage.getItem("nick");
-        if(!zalogowany) {
+        const loggedUser = localStorage.getItem("nick");
+        if (!loggedUser) {
             window.location.href = "index.html";
         } else {
-            document.getElementById("user-display").innerText = zalogowany;
+            document.getElementById("user-info").innerText = loggedUser;
         }
 
-        async function zapiszGrafik() {
-            const nick = document.getElementById("kierowca-nick").value;
-            const linia = document.getElementById("kierowca-linia").value;
-            const zmiana = document.getElementById("kierowca-zmiana").value;
-            const autobus = document.getElementById("kierowca-autobus").value;
-
-            const res = await fetch("/grafik", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ nick, linia, zmiana, autobus })
-            });
-
-            const data = await res.json();
-            if(data.success) {
-                document.getElementById("status").innerText = "Zapisano pomyślnie!";
-            }
+        function goToGrafik() {
+            window.location.href = "grafik.html"; 
         }
 
-        function wyloguj() {
-            localStorage.clear();
+        function logout() {
+            localStorage.removeItem("nick");
             window.location.href = "index.html";
         }
     </script>
