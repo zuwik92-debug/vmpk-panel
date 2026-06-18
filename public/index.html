@@ -3,194 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logowanie do panelu</title>
+    <title>Logowanie do panelu - VMPK</title>
     <style>
-        /* Całkowite zerowanie marginesów i paddingów strony */
-        * {
-            box-sizing: border-box !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        /* Tło na absolutnie cały ekran - wymuszenie BRAKU powtarzania zdjęcia */
-        body, html {
-            height: 100vh !important;
-            width: 100vw !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            overflow: hidden !important;
-            background-image: url('tlo.jpg') !important;
-            background-size: cover !important;
-            background-position: center center !important;
-            background-repeat: no-repeat !important; /* TO BLOKUJE DUBLOWANIE OBRAZKA */
-            background-attachment: fixed !important;
-            display: flex !important;
-            justify-content: center !important;
-            align-items: flex-start !important; 
-            background-color: #121212;
-            padding-top: 15vh !important; /* Przesunięcie logowania w górę */
-        }
-
-        /* Przyciemniająca nakładka dla czytelności napisów */
-        .bg-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.2);
-            z-index: 1;
-        }
-
-        /* Panel logowania - przezroczysty, bez ramek, bez pudła */
-        .login-box {
-            position: relative;
-            z-index: 2;
-            width: 100%;
-            max-width: 400px;
-            color: white;
-            padding: 20px;
-        }
-
-        h2 {
-            font-size: 2.5rem;
-            margin-bottom: 2.5rem;
-            font-weight: 400;
-            text-align: center;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
-        }
-
-        .input-group {
-            margin-bottom: 1.8rem;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-size: 14px;
-            color: #eee;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 500;
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.8);
-        }
-
-        /* Pola tekstowe - CAŁKOWICIE przezroczyste, brak systemowego białego tła */
-        .input-group input {
-            width: 100%;
-            padding: 12px 4px;
-            background: transparent !important; 
-            background-color: transparent !important;
-            border: none !important;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.5) !important; 
-            color: white !important;
-            font-size: 18px;
-            outline: none;
-            transition: 0.3s;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-        }
-
-        .input-group input:focus {
-            border-bottom-color: rgba(255, 255, 255, 0.9) !important;
-        }
-
-        /* Przeglądarki lubią wymuszać żółte/białe tło przy autouzupełnianiu - to je blokuje */
-        .input-group input:-webkit-autofill,
-        .input-group input:-webkit-autofill:hover, 
-        .input-group input:-webkit-autofill:focus {
-            -webkit-text-fill-color: white !important;
-            -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
-            transition: background-color 5000s ease-in-out 0s;
-        }
-
-        .actions {
-            display: flex;
-            flex-direction: column;
-            margin-top: 2.5rem;
-            align-items: center;
-        }
-
-        /* Przycisk logowania - usunięta ramka, czysty tekst */
-        .btn-login {
-            width: auto;
-            background: transparent !important;
-            border: none !important; 
-            color: white;
-            padding: 10px 20px;
-            font-size: 16px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            cursor: pointer;
-            transition: 0.2s;
-            font-weight: 600;
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
-        }
-
-        .btn-login:hover {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        #status {
-            margin-top: 15px;
-            color: #ff6b6b;
-            font-size: 14px;
-            text-align: center;
-            font-weight: bold;
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.9);
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body, html { height: 100%; width: 100%; overflow: hidden; background-image: url('https://i.imgur.com/vP96UoH.jpg'); background-size: cover; background-position: center; display: flex; justify-content: center; align-items: center; }
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1; }
+        .login-container { position: relative; z-index: 2; background: rgba(20, 20, 20, 0.85); padding: 40px; border-radius: 8px; width: 100%; max-width: 400px; border: 1px solid #333; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+        h2 { color: #fff; margin-bottom: 25px; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; color: #bbb; font-size: 12px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
+        .input-group input { width: 100%; padding: 12px; background: #2b2b2b; border: 1px solid #444; color: #fff; border-radius: 4px; }
+        button { width: 100%; padding: 12px; background-color: #007acc; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        button:hover { background-color: #0062a3; }
     </style>
 </head>
 <body>
-
-    <div class="bg-overlay"></div>
-    
-    <div class="login-box">
+    <div class="overlay"></div>
+    <div class="login-container">
         <h2>Logowanie do panelu</h2>
-        
-        <div class="input-group">
-            <label>Nick:</label>
-            <input type="text" id="nick" autocomplete="off">
-        </div>
-
-        <div class="input-group">
-            <label>Hasło:</label>
-            <input type="password" id="haslo">
-        </div>
-
-        <div class="actions">
-            <button class="btn-login" onclick="login()">Zaloguj się</button>
-        </div>
-
-        <p id="status"></p>
+        <form id="login-form">
+            <div class="input-group">
+                <label>Nick</label>
+                <input type="text" id="username" required>
+            </div>
+            <div class="input-group">
+                <label>Hasło</label>
+                <input type="password" id="password" required>
+            </div>
+            <button type="submit">Zaloguj się</button>
+        </form>
     </div>
-
     <script>
-        async function login() {
-            const nick = document.getElementById("nick").value;
-            const haslo = document.getElementById("haslo").value;
-            const status = document.getElementById("status");
-
-            if(!nick || !haslo) {
-                status.innerText = "Uzupełnij wszystkie pola!";
-                return;
-            }
-
-            const res = await fetch("/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ nick, haslo })
-            });
-
-            const data = await res.json();
-
-            if (data.success) {
-                localStorage.setItem("nick", nick);
-                window.location.href = "panel.html";
-            } else {
-                status.innerText = "Błędny nick lub hasło!";
-            }
-        }
+        document.getElementById("login-form").addEventListener("submit", function(e) {
+            e.preventDefault();
+            localStorage.setItem("nick", document.getElementById("username").value);
+            window.location.href = "panel.html";
+        });
     </script>
 </body>
 </html>
