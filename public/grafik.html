@@ -5,345 +5,157 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grafik Kierowców - VMPK</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body, html { height: 100vh; width: 100vw; overflow: hidden; background-color: #121212; color: #fff; }
+        
+        .app-container { display: flex; height: 100vh; }
+        
+        /* Panel boczny */
+        .sidebar { width: 260px; background-color: #161616; padding: 30px 20px; display: flex; flex-direction: column; gap: 30px; border-right: 1px solid #222; flex-shrink: 0; }
+        .menu-list { display: flex; flex-direction: column; gap: 12px; list-style: none; }
+        .menu-item button { width: 100%; background-color: #2a2a2a; color: #fff; border: none; padding: 12px 15px; text-align: left; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .menu-item button:hover, .menu-item button.active { background-color: #3a3a3a; border-left: 4px solid #007acc; padding-left: 11px; }
+        .btn-logout { background-color: #4a2323 !important; }
+        .btn-logout:hover { background-color: #632d2d !important; }
 
-        html, body {
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-            background-color: #121212;
-        }
+        /* Główna sekcja */
+        .main-content { flex-grow: 1; background-color: #0c0c0c; padding: 30px; display: flex; flex-direction: column; overflow: hidden; }
+        .header-section { margin-bottom: 20px; }
+        .header-section h1 { font-size: 24px; margin-bottom: 5px; color: #fff; }
+        .header-section p { color: #888; font-size: 14px; }
 
-        .app-container {
-            display: flex;
-            width: 100%;
-            height: 100vh;
-        }
+        /* Kontener tabeli z przewijaniem */
+        .table-container { flex-grow: 1; overflow: auto; background-color: #161616; border: 1px solid #222; border-radius: 6px; }
+        
+        /* Styl tabeli grafiku */
+        table { border-collapse: collapse; width: 100%; min-width: 1400px; text-align: center; font-size: 13px; }
+        
+        /* Nagłówki (Kierowcy) - zablokowane na górze przy przewijaniu */
+        th { background-color: #1f1f1f; color: #007acc; font-weight: bold; padding: 12px 15px; border: 1px solid #2a2a2a; position: sticky; top: 0; z-index: 2; }
+        th:first-child { position: sticky; left: 0; background-color: #1f1f1f; z-index: 3; color: #fff; width: 140px; }
 
-        /* PANEL BOCZNY */
-        .sidebar {
-            width: 260px;
-            background-color: #161616;
-            color: white;
-            padding: 30px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-            height: 100%;
-            flex-shrink: 0;
-            border-right: 1px solid #222;
-        }
+        /* Wiersze (Dni) */
+        td { padding: 10px; border: 1px solid #2a2a2a; background-color: #161616; color: #ccc; }
+        tr:hover td { background-color: #1c1c1c; }
+        
+        /* Pierwsza kolumna (Dni miesiąca) - zablokowana przy przewijaniu w bok */
+        td:first-child { position: sticky; left: 0; background-color: #1a1a1a; font-weight: bold; color: #fff; text-align: left; padding-left: 15px; border-right: 2px solid #2a2a2a; }
 
-        .sidebar h1 {
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-            padding-left: 10px;
-        }
+        /* Weekend wyróżniony na czerwono */
+        .weekend td:first-child { color: #ff4d4d; }
+        .weekend td { background-color: #1a1515; }
 
-        .menu-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            list-style: none;
-        }
-
-        .menu-item button {
-            width: 100%;
-            background-color: #2a2a2a;
-            color: #ffffff;
-            border: none;
-            padding: 12px 15px;
-            font-size: 14px;
-            text-align: left;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-weight: 500;
-        }
-
-        .menu-item button:hover {
-            background-color: #3a3a3a;
-        }
-
-        .menu-item.active button {
-            background-color: #3a3a3a;
-            border-left: 4px solid #ffffff;
-            padding-left: 11px;
-        }
-
-        .menu-item button.btn-logout {
-            background-color: #4a2323;
-            color: #ff9999;
-            margin-top: 10px;
-        }
-
-        .menu-item button.btn-logout:hover {
-            background-color: #5c2b2b;
-            color: #ffffff;
-        }
-
-        /* GŁÓWNA TREŚĆ - GRAFIK */
-        .main-content {
-            flex-grow: 1;
-            background-color: #0c0c0c;
-            padding: 30px;
-            overflow-y: auto;
-            color: #ffffff;
-        }
-
-        /* Górna belka informacyjna o kierowcy (styl ze screena) */
-        .driver-badge-container {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 20px;
-        }
-
-        .driver-badge {
-            background-color: #181818;
-            border: 1px solid #2c2c2c;
-            padding: 8px 16px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-        }
-
-        .badge-blue {
-            background-color: #007acc;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-
-        .badge-gray {
-            background-color: #444;
-            color: #ddd;
-            padding: 2px 8px;
-            border-radius: 4px;
-        }
-
-        .badge-green {
-            background-color: #008000;
-            color: #fff;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-
-        /* Kontener na całą tabelę */
-        .graphic-box {
-            background-color: #131313;
-            border: 1px solid #222;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-        }
-
-        .graphic-title {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #eee;
-            letter-spacing: 0.5px;
-        }
-
-        /* Stylizacja tabeli */
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            color: #b3b3b3;
-            font-size: 14px;
-            min-width: 800px;
-        }
-
-        th, td {
-            border: 1px solid #242424;
-            padding: 12px;
-            text-align: center;
-        }
-
-        /* Nagłówki (Kierowcy) */
-        th {
-            background-color: #1a1a1a;
-            color: #ffffff;
-            font-weight: 600;
-        }
-
-        th small {
-            display: block;
-            color: #888;
-            font-weight: 400;
-            margin-top: 2px;
-        }
-
-        /* Aktywna, podświetlona kolumna zalogowanego (np. Szary) */
-        .current-user-col {
-            background-color: #172a3a !important;
-            color: #ffffff;
-        }
-
-        /* Pierwsza kolumna (Dni tygodnia) */
-        td:first-child {
-            text-align: left;
-            font-weight: 600;
-            color: #ffffff;
-            background-color: #161616;
-            width: 160px;
-        }
-
-        /* Soboty i niedziele na czerwono */
-        .weekend-day {
-            color: #ff4d4d !important;
-        }
-
-        /* Przypisana służba */
-        .duty-cell {
-            color: #ffffff;
-            font-weight: 500;
-        }
-
-        tr:hover td:not(:first-child) {
-            background-color: #1c1c1c;
-        }
+        /* Konstrukcja komórek służb */
+        .duty { display: block; background-color: #262626; padding: 4px 6px; border-radius: 4px; font-size: 11px; border: 1px solid #3a3a3a; color: #e0e0e0; margin: 2px 0; }
+        .highlight-cell { background-color: #152515 !important; border: 1px solid #285028; color: #66bb6a; }
     </style>
 </head>
 <body>
-
     <div class="app-container">
-        
         <aside class="sidebar">
-            <h1>VMPK</h1>
+            <h2>VMPK</h2>
             <ul class="menu-list">
                 <li class="menu-item"><button onclick="window.location.href='panel.html'">🏠 Strona główna</button></li>
-                <li class="menu-item active"><button onclick="window.location.reload()">📅 Grafik</button></li>
-                <li class="menu-item"><button>🛠️ Admin</button></li>
-                <li class="menu-item"><button class="btn-logout" onclick="logout()">🚪 Wyloguj</button></li>
+                <li class="menu-item"><button class="active" onclick="window.location.reload()">📅 Grafik</button></li>
+                <li class="menu-item"><button class="btn-logout" onclick="localStorage.removeItem('nick'); window.location.href='index.html'">🚪 Wyloguj</button></li>
             </ul>
         </aside>
 
         <main class="main-content">
-            
-            <div class="driver-badge-container">
-                <div class="driver-badge">
-                    <span class="badge-blue">Kierowca 5355 — <span id="driver-nick">Admin</span></span>
-                    <span class="badge-gray">Ajent</span>
-                    <span class="badge-green">24 PKT</span>
-                </div>
+            <div class="header-section">
+                <h1>Grafik zakładu Ajent — Czerwiec 2026</h1>
+                <p>Zalogowany jako: <span id="user-info" style="color: #007acc; font-weight: bold;">kierowca</span></p>
             </div>
 
-            <div class="graphic-box">
-                <div class="graphic-title">Grafik zakładu Ajent — czerwiec 2026</div>
-                
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Dzień</th>
-                                <th class="current-user-col">3671<br><small>Szary</small></th>
-                                <th>2476<br><small>Kulis</small></th>
-                                <th>1245<br><small>oskar778</small></th>
-                                <th>1864<br><small>kwaczlis</small></th>
-                                <th>1961<br><small>Typowy</small></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>1 poniedziałek</td>
-                                <td class="current-user-col"></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>2 wtorek</td>
-                                <td class="current-user-col"></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>3 środa</td>
-                                <td class="current-user-col duty-cell">124/03/A #9810</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td class="duty-cell">194/4/A #9540</td>
-                            </tr>
-                            <tr>
-                                <td>4 czwartek</td>
-                                <td class="current-user-col"></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>5 piątek</td>
-                                <td class="current-user-col"></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td class="weekend-day">6 sobota</td>
-                                <td class="current-user-col"></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td class="duty-cell">194/5/A #9548</td>
-                            </tr>
-                            <tr>
-                                <td class="weekend-day">7 niedziela</td>
-                                <td class="current-user-col"></td>
-                                <td></td>
-                                <td class="duty-cell">194/5/A #9548</td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>8 poniedziałek</td>
-                                <td class="current-user-col"></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Dzień miesiąca</th>
+                            <th>3671 Szary.cj</th>
+                            <th>2476 Kishimuraa</th>
+                            <th>4048 Kulis</th>
+                            <th>4519 oskar778</th>
+                            <th>4589 kwaczlis</th>
+                            <th>1915 krzychoonline</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1 poniedziałek</td>
+                            <td></td>
+                            <td><span class="duty">149/1/A #9301</span></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>2 wtorek</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>3 środa</td>
+                            <td><span class="duty">124/03/A #9810</span></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td><span class="duty">194/4/A #9548</span></td>
+                        </tr>
+                        <tr>
+                            <td>4 czwartek</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>5 piątek</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td><span class="duty highlight-cell">194/5/A #9211</span></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr class="weekend">
+                            <td>6 sobota</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td><span class="duty">194/5/A #9548</span></td>
+                        </tr>
+                        <tr class="weekend">
+                            <td>7 niedziela</td>
+                            <td></td>
+                            <td></td>
+                            <td><span class="duty">194/5/A #9548</span></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </main>
-
     </div>
 
     <script>
-        const loggedUser = localStorage.getItem("nick");
-        if (!loggedUser) {
+        const user = localStorage.getItem("nick");
+        if (!user) {
             window.location.href = "index.html";
         } else {
-            document.getElementById("driver-nick").innerText = loggedUser;
-        }
-
-        function logout() {
-            localStorage.removeItem("nick");
-            window.location.href = "index.html";
+            document.getElementById("user-info").innerText = user;
         }
     </script>
 </body>

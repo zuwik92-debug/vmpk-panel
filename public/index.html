@@ -6,7 +6,18 @@
     <title>Logowanie do panelu - VMPK</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body, html { height: 100%; width: 100%; overflow: hidden; background-image: url('https://i.imgur.com/vP96UoH.jpg'); background-size: cover; background-position: center; display: flex; justify-content: center; align-items: center; }
+        body, html { 
+            height: 100%; 
+            width: 100%; 
+            overflow: hidden; 
+            background-image: url('tlo.jpg') !important; 
+            background-size: cover; 
+            background-position: center center; 
+            background-repeat: no-repeat;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
         .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1; }
         .login-container { position: relative; z-index: 2; background: rgba(20, 20, 20, 0.85); padding: 40px; border-radius: 8px; width: 100%; max-width: 400px; border: 1px solid #333; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
         h2 { color: #fff; margin-bottom: 25px; }
