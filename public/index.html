@@ -77,22 +77,27 @@
             outline: none;
         }
         
-        /* Przycisk jako wyśrodkowany, czysty tekst bez tła */
+        /* POWIĘKSZONY PRZYCISK: Czysty tekst bez tła */
         button { 
             background: none;
             border: none;
             color: #fff; 
-            font-size: 11px;
+            font-size: 14px; /* Zwiększona czcionka z 11px */
             font-weight: bold; 
             cursor: pointer; 
             text-transform: uppercase; 
-            letter-spacing: 0.5px;
-            margin-top: 15px;
-            transition: color 0.2s;
+            letter-spacing: 1.5px; /* Bardziej rozstrzelone litery dla lepszego wyglądu */
+            padding: 10px 20px; /* Dodany wewnętrzny margines, żeby łatwiej było kliknąć */
+            margin-top: 10px;
+            transition: all 0.2s ease;
+            width: 100%; /* Rozciągnięty na pełną szerokość okienka, wyśrodkowany tekst */
+            text-align: center;
         }
         
+        /* Efekt po najechaniu myszką */
         button:hover { 
-            color: #ccc; 
+            color: #007acc; /* Zmiana koloru na błękitny przy najechaniu */
+            letter-spacing: 2px; /* Lekkie rozjechanie liter przy hoverze (fajny efekt wizualny) */
         }
     </style>
 </head>
