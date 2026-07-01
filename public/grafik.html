@@ -19,13 +19,13 @@
         .btn-logout:hover { background-color: #632d2d !important; }
 
         /* Główna sekcja */
-        .main-content { flex-grow: 1; background-color: #0c0c0c; padding: 30px; display: flex; flex-direction: column; overflow: hidden; }
+        .main-content { flex-grow: 1; background-color: #0c0c0c; padding: 30px; display: flex; flex-direction: column; overflow: hidden; position: relative; }
         .header-section { margin-bottom: 20px; }
         .header-section h1 { font-size: 24px; margin-bottom: 5px; color: #fff; text-transform: uppercase; }
         .header-section p { color: #888; font-size: 14px; }
 
         /* Kontener tabeli z przewijaniem */
-        .table-container { flex-grow: 1; overflow: auto; background-color: #161616; border: 1px solid #222; border-radius: 6px; }
+        .table-container { flex-grow: 1; overflow: auto; background-color: #161616; border: 1px solid #222; border-radius: 6px; margin-bottom: 60px; }
         
         /* Styl tabeli grafiku */
         table { border-collapse: collapse; width: 100%; min-width: 1400px; text-align: center; font-size: 13px; }
@@ -45,9 +45,39 @@
         .weekend td:first-child { color: #ff4d4d; }
         .weekend td { background-color: #1a1515; }
 
-        /* Konstrukcja komórek służb */
-        .duty { display: block; background-color: #262626; padding: 4px 6px; border-radius: 4px; font-size: 11px; border: 1px solid #3a3a3a; color: #e0e0e0; margin: 2px 0; }
-        .highlight-cell { background-color: #152515 !important; border: 1px solid #285028; color: #66bb6a; }
+        /* KONTENER TESTOWY NA DOLE STRONY */
+        .test-panel {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #222;
+            border-top: 2px solid #ff9800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            z-index: 10;
+            font-size: 13px;
+        }
+        .test-panel input, .test-panel button {
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background: #333;
+            color: #fff;
+        }
+        .test-panel button {
+            background: #ff9800;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        #current-sim-time {
+            color: #ff9800;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -69,11 +99,17 @@
 
             <div class="table-container">
                 <table id="grafik-table">
-                    <thead id="table-head">
-                        </thead>
-                    <tbody id="table-body">
-                        </tbody>
+                    <thead id="table-head"></thead>
+                    <tbody id="table-body"></tbody>
                 </table>
+            </div>
+
+            <div class="test-panel">
+                <span>🛠️ TRYB TESTOWY DATA:</span>
+                <input type="date" id="test-date" value="2026-06-30">
+                <input type="time" id="test-time" value="23:59">
+                <button onclick="uruchomTest()">Ustaw czas i testuj</button>
+                <span>Obecny czas systemu: <span id="current-sim-time">Brak (Czas realny)</span></span>
             </div>
         </main>
     </div>
@@ -81,90 +117,82 @@
     <script>
         // Sprawdzenie sesji użytkownika
         const user = localStorage.getItem("nick");
-        if (!user) {
-            window.location.href = "index.html";
-        } else {
-            document.getElementById("user-info").innerText = user;
-        }
+        if (!user) { window.location.href = "index.html"; } else { document.getElementById("user-info").innerText = user; }
 
-        // Lista Twoich kierowców (możesz tu dopisywać kolejnych)
-        const kierowcy = [
-            "3671 Szary.cj",
-            "2476 Kishimuraa",
-            "4048 Kulis",
-            "4519 oskar778",
-            "4589 kwaczlis",
-            "1915 krzychoonline",
-            "1961 Typowy Warszawiak"
-        ];
-
-        // Nazwy miesięcy po polsku do nagłówka
-        const nazwyMiesiecy = [
-            "Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec",
-            "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"
-        ];
-
-        // Nazwy dni tygodnia
+        const kierowcy = ["3671 Szary.cj", "2476 Kishimuraa", "4048 Kulis", "4519 oskar778", "4589 kwaczlis", "1915 krzychoonline", "1961 Typowy Warszawiak"];
+        const nazwyMiesiecy = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
         const dniTygodnia = ["niedziela", "poniedziałek", "wtorek", "środa", "czwartek", "piątek", "sobota"];
 
         let aktualnyMiesiac = -1;
+        let wirtualnyCzas = null; // Przechowuje czas testowy
+
+        function pobierzAktualnyCzas() {
+            if (wirtualnyCzas) {
+                // Dodajemy 1 sekundę przy każdym wywołaniu zegara w tle (wywoływany co 1 sek)
+                wirtualnyCzas.setSeconds(wirtualnyCzas.getSeconds() + 1);
+                
+                // Pokazujemy wirtualny zegar w panelu testowym
+                document.getElementById("current-sim-time").innerText = wirtualnyCzas.toLocaleString('pl-PL');
+                return wirtualnyCzas;
+            }
+            document.getElementById("current-sim-time").innerText = "Czas realny komputera";
+            return new Date();
+        }
 
         function generujGrafik() {
-            const teraz = new Date();
+            const teraz = pobierzAktualnyCzas();
             const rok = teraz.getFullYear();
-            const miesiacIdx = teraz.getMonth(); // 0 = Styczeń, 11 = Grudzień
+            const miesiacIdx = teraz.getMonth();
 
-            // Sprawdzamy czy miesiąc się zmienił (lub czy to pierwsze uruchomienie)
+            // Jeżeli miesiąc się nie zmienił, nie przeładowuj tabeli
             if (miesiacIdx === aktualnyMiesiac) return;
             aktualnyMiesiac = miesiacIdx;
 
-            // 1. Aktualizacja nagłówka h1
+            // Czyszczenie i budowanie na nowo
             document.getElementById("dynamic-title").innerText = `GRAFIK VMPK KŁOSOK — ${nazwyMiesiecy[miesiacIdx]} ${rok}`;
 
-            // 2. Generowanie nagłówków tabeli (Kierowcy)
             const thead = document.getElementById("table-head");
             let headHtml = `<tr><th>Dzień miesiąca</th>`;
-            kierowcy.forEach(kierowca => {
-                headHtml += `<th>${kierowca}</th>`;
-            });
+            kierowcy.forEach(k => headHtml += `<th>${k}</th>`);
             headHtml += `</tr>`;
             thead.innerHTML = headHtml;
 
-            // 3. Wyliczanie liczby dni w bieżącym miesiącu
             const liczbaDni = new Date(rok, miesiacIdx + 1, 0).getDate();
-
-            // 4. Generowanie wierszy (Dni)
             const tbody = document.getElementById("table-body");
             let bodyHtml = "";
 
             for (let dzien = 1; dzien <= liczbaDni; dzien++) {
                 const dataDnia = new Date(rok, miesiacIdx, dzien);
-                const dzienTygodniaIdx = dataDnia.getDay(); // 0 = Niedziela, 6 = Sobota
-                const nazwaDnia = dniTygodnia[dzienTygodniaIdx];
-
-                // Sprawdzenie czy weekend (Sobota = 6, Niedziela = 0)
+                const dzienTygodniaIdx = dataDnia.getDay();
                 const czyWeekend = (dzienTygodniaIdx === 0 || dzienTygodniaIdx === 6);
                 const klasaWiersza = czyWeekend ? ' class="weekend"' : '';
 
                 bodyHtml += `<tr${klasaWiersza}>`;
-                bodyHtml += `<td>${dzien} ${nazwaDnia}</td>`;
-
-                // Generowanie pustych komórek dla każdego kierowcy w tym dniu
-                kierowcy.forEach(() => {
-                    bodyHtml += `<td></td>`;
-                });
-
+                bodyHtml += `<td>${dzien} ${dniTygodnia[dzienTygodniaIdx]}</td>`;
+                kierowcy.forEach(() => bodyHtml += `<td></td>`);
                 bodyHtml += `</tr>`;
             }
-
             tbody.innerHTML = bodyHtml;
         }
 
-        // Pierwsze uruchomienie przy załadowaniu strony
-        generujGrafik();
+        // Funkcja aktywowana przyciskiem z panelu testowego
+        function uruchomTest() {
+            const dVal = document.getElementById("test-date").value; // np. "2026-06-30"
+            const tVal = document.getElementById("test-time").value; // np. "23:59"
+            
+            if(!dVal || !tVal) return alert("Wybierz poprawną datę i godzinę!");
+            
+            // Tworzymy dokładny obiekt daty z pól formularza
+            wirtualnyCzas = new Date(`${dVal}T${tVal}:00`);
+            
+            // Resetujemy flagę miesiąca, żeby zmusić skrypt do natychmiastowego odświeżenia widoku
+            aktualnyMiesiac = -1; 
+            generujGrafik();
+        }
 
-        // Interwał sprawdzający co 10 sekund, czy nie zmieniła się data na nowy miesiąc
-        setInterval(generujGrafik, 10000);
+        // Zegar tyka i sprawdza warunki co 1 sekundę (dla płynności testu)
+        generujGrafik();
+        setInterval(generujGrafik, 1000);
     </script>
 </body>
 </html>
