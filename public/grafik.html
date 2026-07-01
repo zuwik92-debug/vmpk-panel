@@ -21,7 +21,7 @@
         /* Główna sekcja */
         .main-content { flex-grow: 1; background-color: #0c0c0c; padding: 30px; display: flex; flex-direction: column; overflow: hidden; }
         .header-section { margin-bottom: 20px; }
-        .header-section h1 { font-size: 24px; margin-bottom: 5px; color: #fff; }
+        .header-section h1 { font-size: 24px; margin-bottom: 5px; color: #fff; text-transform: uppercase; }
         .header-section p { color: #888; font-size: 14px; }
 
         /* Kontener tabeli z przewijaniem */
@@ -32,10 +32,10 @@
         
         /* Nagłówki (Kierowcy) - zablokowane na górze przy przewijaniu */
         th { background-color: #1f1f1f; color: #007acc; font-weight: bold; padding: 12px 15px; border: 1px solid #2a2a2a; position: sticky; top: 0; z-index: 2; }
-        th:first-child { position: sticky; left: 0; background-color: #1f1f1f; z-index: 3; color: #fff; width: 140px; }
+        th:first-child { position: sticky; left: 0; background-color: #1f1f1f; z-index: 3; color: #fff; width: 160px; }
 
         /* Wiersze (Dni) */
-        td { padding: 10px; border: 1px solid #2a2a2a; background-color: #161616; color: #ccc; }
+        td { padding: 10px; border: 1px solid #2a2a2a; background-color: #161616; color: #ccc; height: 45px; }
         tr:hover td { background-color: #1c1c1c; }
         
         /* Pierwsza kolumna (Dni miesiąca) - zablokowana przy przewijaniu w bok */
@@ -63,100 +63,108 @@
 
         <main class="main-content">
             <div class="header-section">
-                <h1>Grafik zakładu Ajent — Czerwiec 2026</h1>
+                <h1 id="dynamic-title">GRAFIK VMPK KŁOSOK — ...</h1>
                 <p>Zalogowany jako: <span id="user-info" style="color: #007acc; font-weight: bold;">kierowca</span></p>
             </div>
 
             <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Dzień miesiąca</th>
-                            <th>3671 Szary.cj</th>
-                            <th>2476 Kishimuraa</th>
-                            <th>4048 Kulis</th>
-                            <th>4519 oskar778</th>
-                            <th>4589 kwaczlis</th>
-                            <th>1915 krzychoonline</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1 poniedziałek</td>
-                            <td></td>
-                            <td><span class="duty">149/1/A #9301</span></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>2 wtorek</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>3 środa</td>
-                            <td><span class="duty">124/03/A #9810</span></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td><span class="duty">194/4/A #9548</span></td>
-                        </tr>
-                        <tr>
-                            <td>4 czwartek</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>5 piątek</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td><span class="duty highlight-cell">194/5/A #9211</span></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr class="weekend">
-                            <td>6 sobota</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td><span class="duty">194/5/A #9548</span></td>
-                        </tr>
-                        <tr class="weekend">
-                            <td>7 niedziela</td>
-                            <td></td>
-                            <td></td>
-                            <td><span class="duty">194/5/A #9548</span></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
+                <table id="grafik-table">
+                    <thead id="table-head">
+                        </thead>
+                    <tbody id="table-body">
+                        </tbody>
                 </table>
             </div>
         </main>
     </div>
 
     <script>
+        // Sprawdzenie sesji użytkownika
         const user = localStorage.getItem("nick");
         if (!user) {
             window.location.href = "index.html";
         } else {
             document.getElementById("user-info").innerText = user;
         }
+
+        // Lista Twoich kierowców (możesz tu dopisywać kolejnych)
+        const kierowcy = [
+            "3671 Szary.cj",
+            "2476 Kishimuraa",
+            "4048 Kulis",
+            "4519 oskar778",
+            "4589 kwaczlis",
+            "1915 krzychoonline",
+            "1961 Typowy Warszawiak"
+        ];
+
+        // Nazwy miesięcy po polsku do nagłówka
+        const nazwyMiesiecy = [
+            "Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec",
+            "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"
+        ];
+
+        // Nazwy dni tygodnia
+        const dniTygodnia = ["niedziela", "poniedziałek", "wtorek", "środa", "czwartek", "piątek", "sobota"];
+
+        let aktualnyMiesiac = -1;
+
+        function generujGrafik() {
+            const teraz = new Date();
+            const rok = teraz.getFullYear();
+            const miesiacIdx = teraz.getMonth(); // 0 = Styczeń, 11 = Grudzień
+
+            // Sprawdzamy czy miesiąc się zmienił (lub czy to pierwsze uruchomienie)
+            if (miesiacIdx === aktualnyMiesiac) return;
+            aktualnyMiesiac = miesiacIdx;
+
+            // 1. Aktualizacja nagłówka h1
+            document.getElementById("dynamic-title").innerText = `GRAFIK VMPK KŁOSOK — ${nazwyMiesiecy[miesiacIdx]} ${rok}`;
+
+            // 2. Generowanie nagłówków tabeli (Kierowcy)
+            const thead = document.getElementById("table-head");
+            let headHtml = `<tr><th>Dzień miesiąca</th>`;
+            kierowcy.forEach(kierowca => {
+                headHtml += `<th>${kierowca}</th>`;
+            });
+            headHtml += `</tr>`;
+            thead.innerHTML = headHtml;
+
+            // 3. Wyliczanie liczby dni w bieżącym miesiącu
+            const liczbaDni = new Date(rok, miesiacIdx + 1, 0).getDate();
+
+            // 4. Generowanie wierszy (Dni)
+            const tbody = document.getElementById("table-body");
+            let bodyHtml = "";
+
+            for (let dzien = 1; dzien <= liczbaDni; dzien++) {
+                const dataDnia = new Date(rok, miesiacIdx, dzien);
+                const dzienTygodniaIdx = dataDnia.getDay(); // 0 = Niedziela, 6 = Sobota
+                const nazwaDnia = dniTygodnia[dzienTygodniaIdx];
+
+                // Sprawdzenie czy weekend (Sobota = 6, Niedziela = 0)
+                const czyWeekend = (dzienTygodniaIdx === 0 || dzienTygodniaIdx === 6);
+                const klasaWiersza = czyWeekend ? ' class="weekend"' : '';
+
+                bodyHtml += `<tr${klasaWiersza}>`;
+                bodyHtml += `<td>${dzien} ${nazwaDnia}</td>`;
+
+                // Generowanie pustych komórek dla każdego kierowcy w tym dniu
+                kierowcy.forEach(() => {
+                    bodyHtml += `<td></td>`;
+                });
+
+                bodyHtml += `</tr>`;
+            }
+
+            tbody.innerHTML = bodyHtml;
+        }
+
+        // Pierwsze uruchomienie przy załadowaniu strony
+        generujGrafik();
+
+        // Interwał sprawdzający co 10 sekund, czy nie zmieniła się data na nowy miesiąc
+        setInterval(generujGrafik, 10000);
     </script>
 </body>
 </html>
