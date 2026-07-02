@@ -1,1 +1,152 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zarządzanie Grafikiem - VMPK</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body, html { height: 100vh; width: 100vw; overflow: hidden; background-color: #121212; color: #fff; }
+        
+        .app-container { display: flex; height: 100vh; }
+        
+        /* Panel boczny */
+        .sidebar { width: 260px; background-color: #161616; padding: 30px 20px; display: flex; flex-direction: column; gap: 30px; border-right: 1px solid #222; flex-shrink: 0; }
+        .menu-list { display: flex; flex-direction: column; gap: 12px; list-style: none; }
+        .menu-item button { width: 100%; background-color: #2a2a2a; color: #fff; border: none; padding: 12px 15px; text-align: left; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .menu-item button:hover, .menu-item button.active { background-color: #3a3a3a; border-left: 4px solid #ff9800; padding-left: 11px; }
+        
+        .btn-logout { background-color: #4a2323 !important; }
+        .btn-logout:hover { background-color: #632d2d !important; }
 
+        /* Główna sekcja */
+        .main-content { flex-grow: 1; background-color: #0c0c0c; padding: 30px; display: flex; flex-direction: column; overflow-y: auto; }
+        .header-section { margin-bottom: 30px; }
+        .header-section h1 { font-size: 24px; margin-bottom: 5px; color: #ff9800; text-transform: uppercase; }
+        
+        /* Formularz edycji */
+        .admin-box { background: #161616; border: 1px solid #222; padding: 25px; border-radius: 6px; max-width: 500px; width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 12px; font-weight: bold; color: #aaa; margin-bottom: 8px; text-transform: uppercase; }
+        .form-group select, .form-group input { width: 100%; padding: 12px; background: #222; border: 1px solid #333; color: #fff; border-radius: 4px; font-size: 14px; outline: none; }
+        .form-group select:focus, .form-group input:focus { border-color: #ff9800; }
+        
+        .btn-save { width: 100%; padding: 14px; background: #ff9800; color: #121212; border: none; border-radius: 4px; font-weight: bold; font-size: 14px; cursor: pointer; text-transform: uppercase; transition: background 0.2s; }
+        .btn-save:hover { background: #e08600; }
+        
+        .status-msg { margin-top: 15px; font-size: 13px; text-align: center; display: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <h2>VMPK</h2>
+            <ul class="menu-list">
+                <li class="menu-item"><button onclick="window.location.href='panel.html'">🏠 Strona główna</button></li>
+                <li class="menu-item"><button onclick="window.location.href='grafik.html'">📅 Grafik</button></li>
+                <li class="menu-item"><button class="active" onclick="window.location.reload()">✍️ Zarządzaj grafikiem</button></li>
+                <li class="menu-item"><button class="btn-logout" onclick="localStorage.removeItem('nick'); window.location.href='index.html'">🚪 Wyloguj</button></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="header-section">
+                <h1>Panel Dyspozytorski — Wpisywanie Służb</h1>
+                <p style="color: #888; font-size: 14px;">Zalogowany jako uprawniony dyspozytor: <span id="admin-name" style="color: #ff9800; font-weight: bold;">...</span></p>
+            </div>
+
+            <div class="admin-box">
+                <div class="form-group">
+                    <label>Wybierz kierowcę</label>
+                    <select id="select-kierowca"></select>
+                </div>
+
+                <div class="form-group">
+                    <label>Dzień miesiąca</label>
+                    <select id="select-dzien"></select>
+                </div>
+
+                <div class="form-group">
+                    <label>Wpisz służbę / status</label>
+                    <input type="text" id="input-sluzba" placeholder="np. 2/265, Zmiana A, Wolne, CH">
+                </div>
+
+                <button class="btn-save" onclick="zapiszSluzbe()">Zatwierdź i dodaj do grafiku</button>
+                <div class="status-msg" id="status-text"></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Blokada wejścia bez uprawnień
+        const user = localStorage.getItem("nick");
+        const uprawnieni = ["admin", "Ksawery", "Michał", "Maciek"];
+        if (!user || !uprawnieni.includes(user)) {
+            window.location.href = "grafik.html";
+        } else {
+            document.getElementById("admin-name").innerText = user;
+        }
+
+        // Dokładnie ta sama lista kierowców, co w grafiku
+        const kierowcy = [
+            "Ksawery (42069)", "Michał (57137)", "Adam (1111)", "Adam (57771)", "Damian (7902)",
+            "Dawid (50555)", "Dominik (2712)", "Elnur (47601)", "Jakub (23801)", "Jakub (37192)",
+            "Kamil (3617)", "Maciek (5355)", "Mikołaj (433)", "Miłosz (65420)", "Oskar (57123)",
+            "Sebastian (2347)", "Szymon (78102)", "Wojtek (57812)", "Xawery (56459)"
+        ];
+
+        // Generowanie listy kierowców w formularzu
+        const selectKierowca = document.getElementById("select-kierowca");
+        kierowcy.forEach(k => {
+            let opt = document.createElement("option");
+            opt.value = k;
+            opt.innerText = k;
+            selectKierowca.appendChild(opt);
+        });
+
+        // Generowanie dni na podstawie aktualnego miesiąca
+        const teraz = new Date();
+        const liczbaDni = new Date(teraz.getFullYear(), teraz.getMonth() + 1, 0).getDate();
+        const selectDzien = document.getElementById("select-dzien");
+
+        for (let i = 1; i <= liczbaDni; i++) {
+            let opt = document.createElement("option");
+            opt.value = i;
+            opt.innerText = `Dzień ${i}`;
+            selectDzien.appendChild(opt);
+        }
+
+        // Zapisywanie danych do bazy
+        function zapiszSluzbe() {
+            const kierowca = document.getElementById("select-kierowca").value;
+            const dzien = document.getElementById("select-dzien").value;
+            const sluzba = document.getElementById("input-sluzba").value.trim();
+            const statusText = document.getElementById("status-text");
+
+            // Pobieramy istniejący grafik lub tworzymy nowy obiekt
+            let bazaGrafiku = JSON.parse(localStorage.getItem("baza_grafiku")) || {};
+
+            // Tworzymy klucz dla unikalnego zapisu: Kierowca_Dzien
+            const klucz = `${kierowca}_${dzien}`;
+
+            if (sluzba === "") {
+                delete bazaGrafiku[klucz]; // Jeśli pole puste, usuwamy wpis
+            } else {
+                bazaGrafiku[klucz] = sluzba;
+            }
+
+            localStorage.setItem("baza_grafiku", JSON.stringify(bazaGrafiku));
+
+            // Informacja o sukcesie
+            statusText.style.display = "block";
+            statusText.style.color = "#4caf50";
+            statusText.innerText = `Pomyślnie zapisano służbę dla: ${kierowca} na dzień ${dzien}!`;
+            
+            // Wyczyszczenie pola tekstowego po zapisie
+            document.getElementById("input-sluzba").value = "";
+
+            setTimeout(() => { statusText.style.display = "none"; }, 4000);
+        }
+    </script>
+</body>
+</html>
