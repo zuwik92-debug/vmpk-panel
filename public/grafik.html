@@ -87,7 +87,7 @@
         .weekend td:first-child { color: #ff4d4d; }
         .weekend td { background-color: #1a1515; }
 
-        /* WYRÓŻNIENIE WYŁĄCZNIE DLA NICKÓW SZEFÓW (Tylko komórka nagłówka TH) */
+        /* WYRÓŻNIENIE DLA SZEFÓW (Tylko komórka z nickiem Ksawery i Michał) */
         th.boss-header {
             background-color: #1a2a40 !important; /* Ciemnoniebieskie tło pod sam nick */
             color: #38b6ff !important;            /* Jaśniejszy błękit tekstu */
@@ -130,12 +130,12 @@
         const user = localStorage.getItem("nick");
         if (!user) { window.location.href = "index.html"; } else { document.getElementById("user-info").innerText = user; }
 
-        // Pokazanie panelu edycji dla konta testowego admin
-        if (user === "admin") {
+        // Uprawnienia administratora / dyspozytora (Maciek ma dostęp)
+        if (user === "admin" || user === "Ksawery" || user === "Michał" || user === "Maciek") {
             document.querySelector(".btn-admin").style.display = "block";
         }
 
-        // Lista kierowców
+        // Kompletna lista kierowców
         const kierowcy = [
             "Ksawery (42069)",
             "Michał (57137)",
@@ -158,7 +158,7 @@
             "Xawery (56459)"
         ];
 
-        // Funkcja sprawdzająca szefów
+        // Funkcja sprawdzająca kolor nagłówka – tylko Ksawery i Michał
         function czyToSzef(nazwaKierowcy) {
             return nazwaKierowcy.startsWith("Ksawery") || nazwaKierowcy.startsWith("Michał");
         }
@@ -181,7 +181,6 @@
             const thead = document.getElementById("table-head");
             let headHtml = `<tr><th>Dzień miesiąca</th>`;
             kierowcy.forEach(kierowca => {
-                // Kolorujemy tylko nagłówek (th), jeśli to szef
                 const klasaSzefa = czyToSzef(kierowca) ? ' class="boss-header"' : '';
                 headHtml += `<th${klasaSzefa}>${kierowca}</th>`;
             });
@@ -201,7 +200,6 @@
                 bodyHtml += `<tr${klasaWiersza}>`;
                 bodyHtml += `<td>${dzien} ${dniTygodnia[dzienTygodniaIdx]}</td>`;
                 kierowcy.forEach(() => {
-                    // Komórki pod spodem mają zwykły styl, bez zmian tła
                     bodyHtml += `<td></td>`;
                 });
                 bodyHtml += `</tr>`;
