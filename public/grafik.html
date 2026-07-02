@@ -15,6 +15,11 @@
         .menu-list { display: flex; flex-direction: column; gap: 12px; list-style: none; }
         .menu-item button { width: 100%; background-color: #2a2a2a; color: #fff; border: none; padding: 12px 15px; text-align: left; border-radius: 4px; cursor: pointer; font-size: 14px; }
         .menu-item button:hover, .menu-item button.active { background-color: #3a3a3a; border-left: 4px solid #007acc; padding-left: 11px; }
+        
+        /* Przycisk panelu administracyjnego / dyspozytora */
+        .btn-admin { border-left: 4px solid #ff9800 !important; background-color: #2e2416 !important; color: #ff9800 !important; display: none; }
+        .btn-admin:hover { background-color: #42331f !important; }
+        
         .btn-logout { background-color: #4a2323 !important; }
         .btn-logout:hover { background-color: #632d2d !important; }
 
@@ -30,7 +35,7 @@
         /* Styl tabeli grafiku */
         table { border-collapse: collapse; width: 100%; text-align: center; font-size: 13px; table-layout: auto; }
         
-        /* Nagłówki (Kierowcy) - zapobiega ściskaniu przy dużej ilości osób */
+        /* Nagłówki (Kierowcy) */
         th { 
             background-color: #1f1f1f; 
             color: #007acc; 
@@ -40,11 +45,10 @@
             position: sticky; 
             top: 0; 
             z-index: 2; 
-            white-space: nowrap; /* Blokada łamania tekstu w komórce */
-            min-width: 150px;    /* Gwarantowana szerokość kolumny kierowcy */
+            white-space: nowrap; 
+            min-width: 150px;    
         }
         
-        /* Pierwsza kolumna nagłówka (Dzień miesiąca) */
         th:first-child { 
             position: sticky; 
             left: 0; 
@@ -66,7 +70,7 @@
         }
         tr:hover td { background-color: #1c1c1c; }
         
-        /* Pierwsza kolumna (Dni miesiąca) - zablokowana przy przewijaniu w bok */
+        /* Pierwsza kolumna (Dni miesiąca) */
         td:first-child { 
             position: sticky; 
             left: 0; 
@@ -76,11 +80,25 @@
             text-align: left; 
             padding-left: 15px; 
             border-right: 2px solid #2a2a2a; 
+            z-index: 1;
         }
 
         /* Weekend wyróżniony na czerwono */
         .weekend td:first-child { color: #ff4d4d; }
         .weekend td { background-color: #1a1515; }
+
+        /* WYRÓŻNIENIE DLA SZEFÓW (Kolor tła nagłówka i kolumny) */
+        th.boss-column {
+            background-color: #132237 !important; /* Elegancki, ciemnoniebieski nagłówek */
+            color: #38b6ff !important;
+        }
+        td.boss-cell {
+            background-color: #111a26 !important; /* Subtelne ciemnoniebieskie tło kolumny */
+        }
+        /* Hover na wierszu zachowujący wyróżnienie szefa */
+        tr:hover td.boss-cell {
+            background-color: #162436 !important;
+        }
 
         /* Konstrukcja komórek służb */
         .duty { display: block; background-color: #262626; padding: 5px 8px; border-radius: 4px; font-size: 11px; border: 1px solid #3a3a3a; color: #e0e0e0; margin: 2px auto; width: max-content; }
@@ -93,6 +111,7 @@
             <ul class="menu-list">
                 <li class="menu-item"><button onclick="window.location.href='panel.html'">🏠 Strona główna</button></li>
                 <li class="menu-item"><button class="active" onclick="window.location.reload()">📅 Grafik</button></li>
+                <li class="menu-item" id="admin-menu-item"><button class="btn-admin" onclick="window.location.href='zarzadzaj.html'">✍️ Zarządzaj grafikiem</button></li>
                 <li class="menu-item"><button class="btn-logout" onclick="localStorage.removeItem('nick'); window.location.href='index.html'">🚪 Wyloguj</button></li>
             </ul>
         </aside>
@@ -117,7 +136,12 @@
         const user = localStorage.getItem("nick");
         if (!user) { window.location.href = "index.html"; } else { document.getElementById("user-info").innerText = user; }
 
-        // Kompletna lista Twoich kierowców z numerami służbowymi
+        // Pokazanie panelu edycji dla konta testowego admin
+        if (user === "admin") {
+            document.querySelector(".btn-admin").style.display = "block";
+        }
+
+        // Lista kierowców
         const kierowcy = [
             "Ksawery (42069)",
             "Michał (57137)",
@@ -140,6 +164,11 @@
             "Xawery (56459)"
         ];
 
+        // Funkcja sprawdzająca szefów
+        function czyToSzef(nazwaKierowcy) {
+            return nazwaKierowcy.startsWith("Ksawery") || nazwaKierowcy.startsWith("Michał");
+        }
+
         const nazwyMiesiecy = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
         const dniTygodnia = ["niedziela", "poniedziałek", "wtorek", "środa", "czwartek", "piątek", "sobota"];
 
@@ -158,7 +187,8 @@
             const thead = document.getElementById("table-head");
             let headHtml = `<tr><th>Dzień miesiąca</th>`;
             kierowcy.forEach(kierowca => {
-                headHtml += `<th>${kierowca}</th>`;
+                const klasaSzefa = czyToSzef(kierowca) ? ' class="boss-column"' : '';
+                headHtml += `<th${klasaSzefa}>${kierowca}</th>`;
             });
             headHtml += `</tr>`;
             thead.innerHTML = headHtml;
@@ -175,8 +205,9 @@
 
                 bodyHtml += `<tr${klasaWiersza}>`;
                 bodyHtml += `<td>${dzien} ${dniTygodnia[dzienTygodniaIdx]}</td>`;
-                kierowcy.forEach(() => {
-                    bodyHtml += `<td></td>`;
+                kierowcy.forEach(kierowca => {
+                    const klasaKomorkiSzefa = czyToSzef(kierowca) ? ' class="boss-cell"' : '';
+                    bodyHtml += `<td${klasaKomorkiSzefa}></td>`;
                 });
                 bodyHtml += `</tr>`;
             }
@@ -184,7 +215,7 @@
         }
 
         generujGrafik();
-        setInterval(generujGrafik, 10000); // Sprawdza czas rzeczywisty co 10 sekund
+        setInterval(generujGrafik, 10000);
     </script>
 </body>
 </html>
