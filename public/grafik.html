@@ -28,25 +28,62 @@
         .table-container { flex-grow: 1; overflow: auto; background-color: #161616; border: 1px solid #222; border-radius: 6px; }
         
         /* Styl tabeli grafiku */
-        table { border-collapse: collapse; width: 100%; min-width: 1400px; text-align: center; font-size: 13px; }
+        table { border-collapse: collapse; width: 100%; text-align: center; font-size: 13px; table-layout: auto; }
         
-        /* Nagłówki (Kierowcy) - zablokowane na górze przy przewijaniu */
-        th { background-color: #1f1f1f; color: #007acc; font-weight: bold; padding: 12px 15px; border: 1px solid #2a2a2a; position: sticky; top: 0; z-index: 2; }
-        th:first-child { position: sticky; left: 0; background-color: #1f1f1f; z-index: 3; color: #fff; width: 160px; }
+        /* Nagłówki (Kierowcy) - zapobiega ściskaniu przy dużej ilości osób */
+        th { 
+            background-color: #1f1f1f; 
+            color: #007acc; 
+            font-weight: bold; 
+            padding: 14px 12px; 
+            border: 1px solid #2a2a2a; 
+            position: sticky; 
+            top: 0; 
+            z-index: 2; 
+            white-space: nowrap; /* Blokada łamania tekstu w komórce */
+            min-width: 150px;    /* Gwarantowana szerokość kolumny kierowcy */
+        }
+        
+        /* Pierwsza kolumna nagłówka (Dzień miesiąca) */
+        th:first-child { 
+            position: sticky; 
+            left: 0; 
+            background-color: #1f1f1f; 
+            z-index: 3; 
+            color: #fff; 
+            width: 160px; 
+            min-width: 160px;
+        }
 
-        /* Wiersze (Dni) */
-        td { padding: 10px; border: 1px solid #2a2a2a; background-color: #161616; color: #ccc; height: 45px; }
+        /* Wiersze (Dni i komórki na służby) */
+        td { 
+            padding: 10px; 
+            border: 1px solid #2a2a2a; 
+            background-color: #161616; 
+            color: #ccc; 
+            height: 48px; 
+            white-space: nowrap; 
+        }
         tr:hover td { background-color: #1c1c1c; }
         
         /* Pierwsza kolumna (Dni miesiąca) - zablokowana przy przewijaniu w bok */
-        td:first-child { position: sticky; left: 0; background-color: #1a1a1a; font-weight: bold; color: #fff; text-align: left; padding-left: 15px; border-right: 2px solid #2a2a2a; }
+        td:first-child { 
+            position: sticky; 
+            left: 0; 
+            background-color: #1a1a1a; 
+            font-weight: bold; 
+            color: #fff; 
+            text-align: left; 
+            padding-left: 15px; 
+            border-right: 2px solid #2a2a2a; 
+        }
 
         /* Weekend wyróżniony na czerwono */
         .weekend td:first-child { color: #ff4d4d; }
         .weekend td { background-color: #1a1515; }
 
         /* Konstrukcja komórek służb */
-        .duty { display: block; background-color: #262626; padding: 4px 6px; border-radius: 4px; font-size: 11px; border: 1px solid #3a3a3a; color: #e0e0e0; margin: 2px 0; }
+        .duty { display: block; background-color: #262626; padding: 5px 8px; border-radius: 4px; font-size: 11px; border: 1px solid #3a3a3a; color: #e0e0e0; margin: 2px auto; width: max-content; }
     </style>
 </head>
 <body>
@@ -80,9 +117,7 @@
         const user = localStorage.getItem("nick");
         if (!user) { window.location.href = "index.html"; } else { document.getElementById("user-info").innerText = user; }
 
-        // ==========================================
-        // TUTAJ WKLEJ SWOJE NOWE NAZWY UŻYTKOWNIKÓW
-        // ==========================================
+        // Kompletna lista Twoich kierowców z numerami służbowymi
         const kierowcy = [
             "Ksawery (42069)",
             "Michał (57137)",
@@ -102,9 +137,8 @@
             "Sebastian (2347)",
             "Szymon (78102)",
             "Wojtek (57812)",
-            "Xawery (56459)",
+            "Xawery (56459)"
         ];
-        // ==========================================
 
         const nazwyMiesiecy = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
         const dniTygodnia = ["niedziela", "poniedziałek", "wtorek", "środa", "czwartek", "piątek", "sobota"];
