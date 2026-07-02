@@ -13,8 +13,10 @@
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            /* Upewnij się, że plik o dokładnie takiej nazwie jest w tym samym folderze co index.html */
-            background-image: url("Zrzut ekranu 2026-06-19 163406.jpg") !important;
+            background-color: #0c0c0c; /* Kolor awaryjny, gdyby zdjęcie zniknęło */
+            
+            /* Zmień nazwę pliku graficznego na tlo.png w swoim folderze */
+            background-image: url("tlo.png") !important;
             background-repeat: no-repeat !important;
             background-position: center center !important;
             background-size: cover !important;
@@ -93,20 +95,17 @@
     </div>
 
     <script>
-        // Lista kierowców
         const listaKierowcow = [
             "Ksawery", "Michał", "Adam", "Damian", "Dawid", 
             "Dominik", "Elnur", "Jakub", "Kamil", "Maciek", 
             "Mikołaj", "Miłosz", "Oskar", "Sebastian", "Szymon", "Wojtek", "Xawery"
         ];
 
-        // Inicjalizacja bazy kont w localStorage przy pierwszym uruchomieniu
         if (!localStorage.getItem("baza_uzytkownikow")) {
             const db = {
                 "admin": { haslo: "admin", wymagaZmiany: false }
             };
             
-            // Każdy kierowca dostaje na start domyślne hasło: Klosok2026!
             listaKierowcow.forEach(k => {
                 db[k] = { haslo: "Klosok2026!", wymagaZmiany: true };
             });
@@ -116,7 +115,6 @@
 
         let tymczasowoZalogowanyUzytkownik = "";
 
-        // Weryfikacja danych wpisanych w pola tekstowe
         function obslugaLogowania() {
             const nick = document.getElementById("login-nick").value.trim();
             const pass = document.getElementById("login-pass").value;
@@ -141,7 +139,6 @@
             }
         }
 
-        // Zapis nowego hasła
         function zapiszNoweHaslo() {
             const newPass = document.getElementById("new-pass").value;
             const confirmPass = document.getElementById("confirm-pass").value;
