@@ -13,7 +13,12 @@
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            background: url('Zrzut ekranu 2026-06-19 163406.jpg') no-repeat center center/cover;
+            /* Upewnij się, że plik o dokładnie takiej nazwie jest w tym samym folderze co index.html */
+            background-image: url("Zrzut ekranu 2026-06-19 163406.jpg") !important;
+            background-repeat: no-repeat !important;
+            background-position: center center !important;
+            background-size: cover !important;
+            background-attachment: fixed !important;
         }
 
         .login-box {
@@ -88,7 +93,7 @@
     </div>
 
     <script>
-        // Lista uprawnionych kierowców, którzy mogą się zalogować
+        // Lista kierowców
         const listaKierowcow = [
             "Ksawery", "Michał", "Adam", "Damian", "Dawid", 
             "Dominik", "Elnur", "Jakub", "Kamil", "Maciek", 
@@ -121,7 +126,6 @@
             
             errorDiv.style.display = "none";
 
-            // Sprawdzamy czy użytkownik istnieje w bazie i czy hasło się zgadza
             if (db[nick] && db[nick].haslo === pass) {
                 if (db[nick].wymagaZmiany) {
                     tymczasowoZalogowanyUzytkownik = nick;
@@ -137,7 +141,7 @@
             }
         }
 
-        // Zapis nowego hasła i usunięcie wymogu zmiany
+        // Zapis nowego hasła
         function zapiszNoweHaslo() {
             const newPass = document.getElementById("new-pass").value;
             const confirmPass = document.getElementById("confirm-pass").value;
