@@ -36,21 +36,45 @@
         /* Wewnętrzny kontener sklepu */
         .shop-wrapper { padding: 25px; display: flex; flex-direction: column; gap: 20px; flex-grow: 1; overflow-y: auto; }
         
-        .shop-title-bar { background-color: #161616; border: 1px solid #222; padding: 12px 20px; border-radius: 4px; font-size: 14px; font-weight: bold; color: #fff; }
+        .shop-title-bar { background-color: #161616; border: 1px solid #222; padding: 12px 20px; border-radius: 4px; font-size: 14px; font-weight: bold; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+        
+        .btn-back { background-color: #2a2a2a; border: 1px solid #444; color: #fff; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; transition: background 0.2s; }
+        .btn-back:hover { background-color: #3a3a3a; }
 
-        /* Siatka kategorii */
+        /* Widoki sekcji */
+        .shop-view { display: none; }
+        .shop-view.active { display: block; }
+
+        /* Siatka kategorii głównych */
         .category-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
         
-        .category-card { position: relative; height: 320px; border: 1px solid #222; border-radius: 4px; overflow: hidden; cursor: pointer; background-size: cover; background-position: center; transition: transform 0.2s, border-color 0.2s; }
+        .category-card { position: relative; height: 320px; border: 1px solid #222; border-radius: 4px; overflow: hidden; cursor: pointer; background-size: cover; background-position: center; background-color: #1a1a1a; transition: transform 0.2s, border-color 0.2s; }
         .category-card:hover { transform: translateY(-2px); border-color: #007acc; }
         
-        /* Obsługa kafelków, gdy pliki graficzne są lokalne */
-        .card-maps { background-image: url('mapa_tlo.png'); background-color: #1a1a1a; }
-        .card-vehicles { background-image: url('pojazdy_tlo.jpg'); background-color: #1a1a1a; }
+        /* Dynamiczne tła - zabezpieczone przed formatami .png/.jpg */
+        .card-maps { background-image: url('mapa_tlo.png'); }
+        .card-vehicles { background-image: url('pojazdy_tlo.png'), url('pojazdy_tlo.jpg'); }
         
         /* Czerwony pas na dole kafelek */
         .category-info-bar { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(163, 18, 18, 0.9); padding: 15px 20px; display: flex; align-items: center; height: 75px; border-top: 1px solid rgba(255,255,255,0.1); }
         .category-title { font-size: 32px; font-weight: bold; color: #ffcc00; text-shadow: 2px 2px 3px rgba(0,0,0,0.8); letter-spacing: 0.5px; }
+
+        /* Siatka z listą produktów do kupienia */
+        .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding-top: 5px; }
+        
+        .product-card { background-color: #161616; border: 1px solid #222; border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 12px; justify-content: space-between; }
+        .product-card:hover { border-color: #333; }
+        
+        .product-name { font-size: 18px; font-weight: bold; color: #ff9800; border-bottom: 1px solid #222; padding-bottom: 8px; }
+        .product-details { font-size: 13px; color: #ccc; line-height: 1.4; }
+        .product-details span { color: #888; font-weight: bold; }
+        
+        .product-price-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
+        .product-price { font-size: 15px; font-weight: bold; color: #00ff00; }
+        
+        .btn-buy { background-color: #007acc; color: #fff; border: none; padding: 8px 16px; font-size: 13px; font-weight: bold; border-radius: 4px; cursor: pointer; transition: background 0.2s; }
+        .btn-buy:hover { background-color: #0098ff; }
+        .btn-buy.owned { background-color: #1e4620 !important; color: #00ff00 !important; cursor: default; border: 1px solid #2e6931; }
     </style>
 </head>
 <body>
@@ -75,6 +99,7 @@
         </aside>
 
         <main class="main-content">
+            <!-- Górny pasek informacyjny -->
             <div class="top-badge-bar">
                 <div class="badge badge-blue" id="user-badge">Kierowca</div>
                 <div class="badge badge-gray">Kłosok Szczecin</div>
@@ -82,22 +107,30 @@
             </div>
 
             <div class="shop-wrapper">
-                <div class="shop-title-bar">Sklep</div>
+                <div class="shop-title-bar">
+                    <span id="shop-title-text">Sklep</span>
+                    <button class="btn-back" id="btn-back-el" style="display: none;" onclick="pokazMenuGlowne()">⬅️ Powrót</button>
+                </div>
                 
-                <div class="category-grid">
-                    
-                    <div class="category-card card-maps" id="card-maps-el" onclick="otworzKategorie('Mapy')">
-                        <div class="category-info-bar">
-                            <div class="category-title">Mapy</div>
+                <!-- WIDOK 1: GŁÓWNE KATEGORIE SKLEPU -->
+                <div id="view-categories" class="shop-view active">
+                    <div class="category-grid">
+                        <div class="category-card card-maps" onclick="otworzKategorie('Mapy')">
+                            <div class="category-info-bar">
+                                <div class="category-title">Mapy</div>
+                            </div>
+                        </div>
+                        <div class="category-card card-vehicles" onclick="otworzKategorie('Pojazdy')">
+                            <div class="category-info-bar">
+                                <div class="category-title">Pojazdy</div>
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="category-card card-vehicles" id="card-vehicles-el" onclick="otworzKategorie('Pojazdy')">
-                        <div class="category-info-bar">
-                            <div class="category-title">Pojazdy</div>
-                        </div>
-                    </div>
-
+                <!-- WIDOK 2: PRZEGLĄDANIE PRZEDMIOTÓW Z KATEGORII -->
+                <div id="view-items" class="shop-view">
+                    <div class="items-grid" id="items-container"></div>
                 </div>
             </div>
         </main>
@@ -111,7 +144,7 @@
             document.querySelector(".btn-admin").style.display = "flex";
         }
 
-        // System punktowy zsynchronizowany z bazą danych
+        // Baza punktów kierowcy
         let punktyKlucz = `punkty_${user}`;
         if (user === "admin") {
             localStorage.setItem(punktyKlucz, "10000");
@@ -121,15 +154,88 @@
             }
         }
 
-        document.getElementById("user-badge").innerText = user;
-        document.getElementById("points-badge").innerText = `${localStorage.getItem(punktyKlucz)} PKT`;
+        function odswiezPunkty() {
+            document.getElementById("user-badge").innerText = user;
+            document.getElementById("points-badge").innerText = `${localStorage.getItem(punktyKlucz)} PKT`;
+        }
+        odswiezPunkty();
+
+        // --- BAZA PRZEDMIOTÓW W SKLEPIE ---
+        const bazaSklepu = {
+            "Mapy": [
+                { id: "map_szczecin", nazwa: "Szczecin", opis: "Wersja mapy: Godksawis 3.00.00. Zawiera pełną paczkę linii miejskich i podmiejskich przedsiębiorstwa.", cena: 2500 }
+            ],
+            "Pojazdy": [
+                { id: "bus_sol12", nazwa: "Solaris Urbino III 12m", opis: "Standardowy autobus miejski o długości 12 metrów. Wyposażenie: Pulpit ACTIA / MOKI E6.", cena: 1500 },
+                { id: "bus_sol15", nazwa: "Solaris Urbino III 15m", opis: "Trzyosiowy autobus wielkopojemny. Doskonały na linie o średnim obciążeniu.", cena: 2200 },
+                { id: "bus_sol18", nazwa: "Solaris Urbino III 18m", opis: "Przegubowy flagowiec floty VMPK. Maksymalna pojemność pasażerska.", cena: 3000 }
+            ]
+        };
+
+        function otworzKategorie(kategoria) {
+            document.getElementById("shop-title-text").innerText = `Sklep ➔ ${kategoria}`;
+            document.getElementById("btn-back-el").style.display = "block";
+            
+            document.getElementById("view-categories").classList.remove("active");
+            document.getElementById("view-items").classList.add("active");
+            
+            const container = document.getElementById("items-container");
+            container.innerHTML = "";
+            
+            const produkty = bazaSklepu[kategoria] || [];
+            
+            produkty.forEach(prod => {
+                let zakupionyKlucz = `zakup_${user}_${prod.id}`;
+                let czyPosiada = localStorage.getItem(zakupionyKlucz) === "true";
+                
+                let przyciskHTML = czyPosiada 
+                    ? `<button class="btn-buy owned">✓ Posiadane</button>`
+                    : `<button class="btn-buy" onclick="kupPrzedmiot('${prod.id}', ${prod.cena}, '${kategoria}')">Kupuję</button>`;
+
+                container.innerHTML += `
+                    <div class="product-card">
+                        <div>
+                            <div class="product-name">${prod.nazwa}</div>
+                            <div class="product-details">
+                                <span>Opis:</span> ${prod.opis}
+                            </div>
+                        </div>
+                        <div class="product-price-bar">
+                            <div class="product-price">${prod.cena} PKT</div>
+                            ${przyciskHTML}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function kupPrzedmiot(id, cena, kategoria) {
+            let aktualnePunkty = parseInt(localStorage.getItem(punktyKlucz) || "0");
+            
+            if (aktualnePunkty < cena) {
+                alert(`Nie masz wystarczającej ilości punktów! Brakuje Ci ${cena - aktualnePunkty} PKT.`);
+                return;
+            }
+            
+            if (confirm(`Czy na pewno chcesz kupić ten przedmiot za ${cena} PKT?`)) {
+                localStorage.setItem(punktyKlucz, (aktualnePunkty - cena).toString());
+                localStorage.setItem(`zakup_${user}_${id}`, "true");
+                
+                alert("Zakup zakończony sukcesem! Przedmiot został przypisany do Twojego konta.");
+                odswiezPunkty();
+                otworzKategorie(kategoria);
+            }
+        }
+
+        function pokazMenuGlowne() {
+            document.getElementById("shop-title-text").innerText = "Sklep";
+            document.getElementById("btn-back-el").style.display = "none";
+            document.getElementById("view-items").classList.remove("active");
+            document.getElementById("view-categories").classList.add("active");
+        }
 
         function otworzOpcje(nazwa) {
             alert(`Opcja "${nazwa}" jest obecnie w przygotowaniu.`);
-        }
-
-        function otworzKategorie(nazwaKategorii) {
-            alert(`Przeglądasz kategorię: ${nazwaKategorii}`);
         }
     </script>
 </body>
