@@ -1,1 +1,151 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sklep VMPK - Kłosok</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body, html { height: 100vh; width: 100vw; overflow: hidden; background-color: #121212; color: #fff; }
+        
+        .app-container { display: flex; height: 100vh; }
+        
+        /* Panel boczny */
+        .sidebar { width: 260px; background-color: #161616; padding: 30px 20px; display: flex; flex-direction: column; gap: 30px; border-right: 1px solid #222; flex-shrink: 0; overflow-y: auto; }
+        .sidebar h2 { font-size: 26px; font-weight: bold; color: #fff; letter-spacing: 1px; }
+        .menu-list { display: flex; flex-direction: column; gap: 12px; list-style: none; }
+        .menu-item button { width: 100%; background-color: #2a2a2a; color: #fff; border: none; padding: 12px 15px; text-align: left; border-radius: 4px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 10px; transition: background 0.2s; }
+        .menu-item button:hover { background-color: #333; }
+        .menu-item button.active { background-color: #3a3a3a; border-left: 4px solid #007acc; padding-left: 11px; }
+        
+        .btn-admin { border-left: 4px solid #ff9800 !important; background-color: #2e2416 !important; color: #ff9800 !important; display: none; }
+        .btn-admin:hover { background-color: #42331f !important; }
+        .btn-logout { background-color: #4a2323 !important; }
+        .btn-logout:hover { background-color: #632d2d !important; }
 
+        /* Główna sekcja */
+        .main-content { flex-grow: 1; background-color: #0c0c0c; display: flex; flex-direction: column; overflow: hidden; }
+        
+        /* Górny czarny panel ze wzoru */
+        .top-badge-bar { background-color: #080808; width: 100%; padding: 15px; display: flex; justify-content: center; align-items: center; gap: 5px; border-bottom: 1px solid #1a1a1a; }
+        .badge { padding: 6px 14px; font-weight: bold; font-size: 13px; border-radius: 4px; }
+        .badge-blue { background-color: #007acc; color: #fff; }
+        .badge-gray { background-color: #3a3a3a; color: #ccc; }
+        .badge-green { background-color: #008000; color: #fff; }
+
+        /* Wewnętrzny kontener sklepu */
+        .shop-wrapper { padding: 25px; display: flex; flex-direction: column; gap: 20px; flex-grow: 1; overflow-y: auto; }
+        
+        .shop-title-bar { background-color: #161616; border: 1px solid #222; padding: 12px 20px; border-radius: 4px; font-size: 14px; font-weight: bold; color: #fff; text-transform: capitalize; }
+        
+        /* Sekcja Moje przedmioty */
+        .my-items-bar { display: flex; justify-content: center; margin: 5px 0; }
+        .btn-my-items { background: none; border: none; color: #38b6ff; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .btn-my-items:hover { color: #007acc; text-decoration: underline; }
+
+        /* Siatka kategorii oparta na dużych boksach ze zdjęciem */
+        .category-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px; }
+        
+        .category-card { position: relative; height: 320px; border: 1px solid #222; border-radius: 4px; overflow: hidden; cursor: pointer; background-size: cover; background-position: center; transition: transform 0.2s, border-color 0.2s; }
+        .category-card:hover { transform: translateY(-2px); border-color: #ff9800; }
+        
+        /* Dolny czerwony pas informacyjny ze wzoru */
+        .category-info-bar { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(204, 24, 24, 0.85); padding: 15px 20px; display: flex; flex-direction: column; gap: 20px; }
+        .category-title { font-size: 32px; font-weight: bold; color: #ffcc00; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        .category-desc { font-size: 14px; color: #ff9800; font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <h2>VMPK</h2>
+            <ul class="menu-list">
+                <li class="menu-item"><button onclick="window.location.href='panel.html'">🏠 Strona główna</button></li>
+                <li class="menu-item"><button onclick="window.location.href='grafik.html'">📅 Grafik</button></li>
+                <li class="menu-item"><button onclick="window.location.href='tabor.html'">🚌 Tabor</button></li>
+                <li class="menu-item"><button onclick="otworzOpcje('GODZINY ZMIAN')">⏱️ Godziny zmian</button></li>
+                
+                <li class="menu-item"><button class="active" onclick="window.location.reload()">🛒 Sklep</button></li>
+                <li class="menu-item"><button onclick="otworzOpcje('RAPORTY')">📊 Raporty</button></li>
+                <li class="menu-item"><button onclick="otworzOpcje('ZGŁOSZENIA')">⚠️ Zgłoszenia</button></li>
+                <li class="menu-item"><button onclick="otworzOpcje('WNIOSKI')">📝 Wnioski</button></li>
+                
+                <li class="menu-item" id="admin-menu-item"><button class="btn-admin" onclick="window.location.href='zarzadzaj.html'">✍️ Zarządzaj grafikiem</button></li>
+                
+                <li class="menu-item"><button class="btn-logout" onclick="localStorage.removeItem('nick'); window.location.href='index.html'">🚪 Wyloguj</button></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <!-- Górny pasek ze wzoru zdjęcia -->
+            <div class="top-badge-bar">
+                <div class="badge badge-blue" id="user-badge">Kierowca</div>
+                <div class="badge badge-gray">Kłosok Szczecin</div>
+                <div class="badge badge-green" id="points-badge">0 PKT</div>
+            </div>
+
+            <div class="shop-wrapper">
+                <div class="shop-title-bar">Sklep</div>
+                
+                <div class="my-items-bar">
+                    <button class="btn-my-items" onclick="otworzOpcje('Moje przedmioty')">🛒 Moje przedmioty</button>
+                </div>
+
+                <!-- Siatka dużych kafli graficznych -->
+                <div class="category-grid">
+                    
+                    <!-- Kategoria 1 -->
+                    <div class="category-card" style="background-image: url('https://picsum.photos/id/10/800/500');" onclick="otworzKategorie('Mapy')">
+                        <div class="category-info-bar">
+                            <div class="category-title">Mapy</div>
+                            <div class="category-desc">Linie, rozkłady, modyfikacje</div>
+                        </div>
+                    </div>
+
+                    <!-- Kategoria 2 -->
+                    <div class="category-card" style="background-image: url('https://picsum.photos/id/20/800/500');" onclick="otworzKategorie('Pojazdy')">
+                        <div class="category-info-bar">
+                            <div class="category-title">Pojazdy</div>
+                            <div class="category-desc">Modele, tekstury, modyfikacje</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const user = localStorage.getItem("nick");
+        if (!user) { window.location.href = "index.html"; }
+
+        if (user === "admin" || user === "Ksawery" || user === "Michał" || user === "Maciek") {
+            document.querySelector(".btn-admin").style.display = "flex";
+        }
+
+        // --- USTAWIENIA PUNKTÓW DLA ADMINA I KIEROWCÓW ---
+        let punktyKlucz = `punkty_${user}`;
+        
+        if (user === "admin") {
+            localStorage.setItem(punktyKlucz, "10000");
+        } else {
+            // Wszyscy pozostali startują i mają 0 punktów
+            if (localStorage.getItem(punktyKlucz) === null) {
+                localStorage.setItem(punktyKlucz, "0");
+            }
+        }
+
+        // Wyświetlanie danych użytkownika w górnym pasku
+        document.getElementById("user-badge").innerText = user;
+        document.getElementById("points-badge").innerText = `${localStorage.getItem(punktyKlucz)} PKT`;
+
+        function otworzOpcje(nazwa) {
+            alert(`Zakładka "${nazwa}" jest obecnie w przygotowaniu.`);
+        }
+
+        function otworzKategorie(nazwaKategorii) {
+            alert(`Przeglądasz kategorię: ${nazwaKategorii}`);
+        }
+    </script>
+</body>
+</html>
