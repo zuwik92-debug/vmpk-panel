@@ -32,18 +32,12 @@
         /* Siatka kart */
         .tabor-grid { flex-grow: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding-bottom: 20px; }
         
-        .bus-card { background: #161616; border: 1px solid #222; border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 12px; transition: transform 0.2s, border-color 0.2s; }
-        .bus-card:hover { transform: translateY(-3px); border-color: #333; }
+        /* Styl karty pojazdu */
+        .bus-card { background: #161616; border: 1px solid #222; border-radius: 6px; padding: 22px; display: flex; flex-direction: column; gap: 8px; transition: transform 0.2s, border-color 0.2s; }
+        .bus-card:hover { transform: translateY(-3px); border-color: #007acc; }
         
-        .bus-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 10px; }
-        .bus-number { font-size: 20px; font-weight: bold; color: #ff9800; }
-        .bus-status { font-size: 11px; padding: 3px 8px; border-radius: 20px; font-weight: bold; text-transform: uppercase; }
-        
-        .status-ready { background-color: #1b4332; color: #52b788; border: 1px solid #2d6a4f; }
-        .status-line { background-color: #1a2a40; color: #38b6ff; border: 1px solid #007acc; }
-        .status-repair { background-color: #4a2323; color: #ff4d4d; border: 1px solid #632d2d; }
-
-        .bus-info { font-size: 14px; color: #ccc; display: flex; flex-direction: column; gap: 5px; }
+        .bus-number { font-size: 22px; font-weight: bold; color: #ff9800; border-bottom: 1px solid #222; padding-bottom: 8px; margin-bottom: 4px; }
+        .bus-info { font-size: 14px; color: #ccc; line-height: 1.4; }
         .bus-info span { color: #888; font-size: 12px; font-weight: bold; text-transform: uppercase; margin-right: 5px; }
     </style>
 </head>
@@ -58,7 +52,7 @@
                 <li class="menu-item"><button class="active" onclick="window.location.reload()">🚌 Tabor</button></li>
                 <li class="menu-item"><button onclick="otworzOpcje('GODZINY ZMIAN')">⏱️ Godziny zmian</button></li>
                 <li class="menu-item"><button onclick="otworzOpcje('SKLEP')">🛒 Sklep</button></li>
-                <li class="menu-item"><button onclick="otworzOpcje('RAPORTY')">📊 Raporty</button></li>
+                <li class="menu-item"><button onclick="otworbOpcje('RAPORTY')">📊 Raporty</button></li>
                 <li class="menu-item"><button onclick="otworzOpcje('ZGŁOSZENIA')">⚠️ Zgłoszenia</button></li>
                 <li class="menu-item"><button onclick="otworzOpcje('WNIOSKI')">📝 Wnioski</button></li>
                 
@@ -70,11 +64,13 @@
 
         <main class="main-content">
             <div class="header-section">
-                <h1>Stan Floty i Taboru VMPK Kłosok</h1>
-                <p>Przeglądaj dostępne autobusy miejskie oraz ich aktualny status operacyjny.</p>
+                <h1>Spis Taboru VMPK Kłosok</h1>
+                <p>Pełna lista autobusów znajdujących się na stanie przedsiębiorstwa.</p>
             </div>
 
-            <div class="tabor-grid" id="tabor-container"></div>
+            <div class="tabor-grid" id="tabor-container">
+                <!-- Tutaj wpadną autobusy ze skryptu -->
+            </div>
         </main>
     </div>
 
@@ -90,14 +86,29 @@
             alert(`Opcja "${nazwa}" jest obecnie w przygotowaniu.`);
         }
 
+        // Zaktualizowana lista autobusów Solaris Urbino III
         const autobusy = [
-            { nr: "101", model: "Solaris Urbino 12 IV", stan: "Sprawny", status: "W zajezdni", klasa: "status-ready" },
-            { nr: "102", model: "Solaris Urbino 12 IV", stan: "Sprawny", status: "Na linii (1/265)", klasa: "status-line" },
-            { nr: "103", model: "Solaris Urbino 18 IV", stan: "Sprawny", status: "W zajezdni", klasa: "status-ready" },
-            { nr: "201", model: "MAN Lion's City 12 C", stan: "Awaria pneumatyki", status: "Warsztat", klasa: "status-repair" },
-            { nr: "202", model: "MAN Lion's City 18 C", stan: "Sprawny", status: "Na linii (2/265)", klasa: "status-line" },
-            { nr: "301", model: "Mercedes-Benz Citaro G", stan: "Przegląd OT1", status: "Warsztat", klasa: "status-repair" },
-            { nr: "302", model: "Mercedes-Benz Conecto", stan: "Sprawny", status: "W zajezdni", klasa: "status-ready" }
+            { nr: "001", model: "Solaris Urbino III 18m ACTIA E6" },
+            { nr: "003", model: "Solaris Urbino III 18m MOKI E6 / ACTIA E6 (MEGAPACK)" },
+            { nr: "006", model: "Solaris Urbino III 18m MOKI E6 / ACTIA E6 (MEGAPACK)" },
+            { nr: "008", model: "Solaris Urbino III 18m ACTIA E6" },
+            { nr: "019", model: "Solaris Urbino III 15m ACTIA E6" },
+            { nr: "020", model: "Solaris Urbino III 10m MOKI E6 / ACTIA (MEGAPACK)" },
+            { nr: "021", model: "Solaris Urbino III 10m MOKI E6 / ACTIA (MEGAPACK)" },
+            { nr: "022", model: "Solaris Urbino III 12m MOKI E6 / ACTIA E6 (MEGAPACK)" },
+            { nr: "023", model: "Solaris Urbino III 12m MOKI E6 / ACTIA E6 (MEGAPACK)" },
+            { nr: "024", model: "Solaris Urbino III 12m ACTIA E6" },
+            { nr: "025", model: "Solaris Urbino III 12m MOKI E6 / ACTIA E6 (MEGAPACK)" },
+            { nr: "026", model: "Solaris Urbino III 12m MOKI E6 / ACTIA E6 (MEGAPACK)" },
+            { nr: "027", model: "Solaris Urbino III 12m ACTIA E6" },
+            { nr: "028", model: "Solaris Urbino III 12m MOKI E6 / ACTIA E6 (MEGAPACK)" },
+            { nr: "029", model: "Solaris Urbino III 12m ACTIA E6" },
+            { nr: "030", model: "Solaris Urbino III 12m MOKI E6 / ACTIA E6 (MEGAPACK)" },
+            { nr: "031", model: "Solaris Urbino III 12m ACTIA E6" },
+            { nr: "057", model: "Solaris Urbino III 18m ACTIA E6" },
+            { nr: "058", model: "Solaris Urbino III 18m ACTIA E6" },
+            { nr: "059", model: "Solaris Urbino III 18m ACTIA E6" },
+            { nr: "060", model: "Solaris Urbino III 18m ACTIA E6" }
         ];
 
         function wyswietlTabor() {
@@ -107,13 +118,9 @@
             autobusy.forEach(bus => {
                 container.innerHTML += `
                     <div class="bus-card">
-                        <div class="bus-header">
-                            <div class="bus-number">#${bus.nr}</div>
-                            <div class="bus-status ${bus.klasa}">${bus.status}</div>
-                        </div>
+                        <div class="bus-number">#${bus.nr}</div>
                         <div class="bus-info">
-                            <div><span>Model:</span> ${bus.model}</div>
-                            <div><span>Stan:</span> ${bus.stan}</div>
+                            <span>Model:</span> ${bus.model}
                         </div>
                     </div>
                 `;
