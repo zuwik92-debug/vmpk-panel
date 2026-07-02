@@ -3,17 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Kierowcy - VMPK</title>
+    <title>Panel Główny - VMPK</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body, html { height: 100vh; width: 100vw; overflow: hidden; background-color: #121212; color: #fff; }
+        
         .app-container { display: flex; height: 100vh; }
-        .sidebar { width: 260px; background-color: #161616; padding: 30px 20px; display: flex; flex-direction: column; gap: 30px; border-right: 1px solid #222; }
+        
+        /* Panel boczny */
+        .sidebar { width: 260px; background-color: #161616; padding: 30px 20px; display: flex; flex-direction: column; gap: 30px; border-right: 1px solid #222; flex-shrink: 0; overflow-y: auto; }
+        .sidebar h2 { font-size: 26px; font-weight: bold; color: #fff; letter-spacing: 1px; }
         .menu-list { display: flex; flex-direction: column; gap: 12px; list-style: none; }
-        .menu-item button { width: 100%; background-color: #2a2a2a; color: #fff; border: none; padding: 12px 15px; text-align: left; border-radius: 4px; cursor: pointer; }
-        .menu-item button:hover { background-color: #3a3a3a; }
+        .menu-item button { width: 100%; background-color: #2a2a2a; color: #fff; border: none; padding: 12px 15px; text-align: left; border-radius: 4px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 10px; transition: background 0.2s; }
+        .menu-item button:hover { background-color: #333; }
+        .menu-item button.active { background-color: #3a3a3a; border-left: 4px solid #007acc; padding-left: 11px; }
+        
+        /* Specjalny przycisk zarzadzania grafikiem dla szefow */
+        .btn-admin { border-left: 4px solid #ff9800 !important; background-color: #2e2416 !important; color: #ff9800 !important; display: none; }
+        .btn-admin:hover { background-color: #42331f !important; }
+        
         .btn-logout { background-color: #4a2323 !important; }
-        .main-content { flex-grow: 1; background-color: #0c0c0c; padding: 50px; }
+        .btn-logout:hover { background-color: #632d2d !important; }
+
+        /* Główna sekcja */
+        .main-content { flex-grow: 1; background-color: #0c0c0c; padding: 40px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
+        .welcome-box { background: #161616; border: 1px solid #222; padding: 30px; border-radius: 6px; }
+        .welcome-box h1 { font-size: 28px; margin-bottom: 10px; }
+        .welcome-box p { color: #aaa; font-size: 15px; }
     </style>
 </head>
 <body>
@@ -21,20 +37,50 @@
         <aside class="sidebar">
             <h2>VMPK</h2>
             <ul class="menu-list">
-                <li class="menu-item"><button onclick="window.location.reload()">🏠 Strona główna</button></li>
+                <li class="menu-item"><button class="active" onclick="window.location.reload()">🏠 Strona główna</button></li>
                 <li class="menu-item"><button onclick="window.location.href='grafik.html'">📅 Grafik</button></li>
+                
+                <!-- NOWE ZAKŁADKI DODANE DO MENU BOCZNEGO -->
+                <li class="menu-item"><button onclick="otworzOpcje('TABOR')">🚌 Tabor</button></li>
+                <li class="menu-item"><button onclick="otworzOpcje('GODZINY ZMIAN')">⏱️ Godziny zmian</button></li>
+                <li class="menu-item"><button onclick="otworzOpcje('SKLEP')">🛒 Sklep</button></li>
+                <li class="menu-item"><button onclick="otworzOpcje('RAPORTY')">📊 Raporty</button></li>
+                <li class="menu-item"><button onclick="otworzOpcje('ZGŁOSZENIA')">⚠️ Zgłoszenia</button></li>
+                <li class="menu-item"><button onclick="otworzOpcje('WNIOSKI')">📝 Wnioski</button></li>
+                
+                <!-- Przycisk widoczny tylko dla uprawnionych -->
+                <li class="menu-item" id="admin-menu-item"><button class="btn-admin" onclick="window.location.href='zarzadzaj.html'">✍️ Zarządzaj grafikiem</button></li>
+                
                 <li class="menu-item"><button class="btn-logout" onclick="localStorage.removeItem('nick'); window.location.href='index.html'">🚪 Wyloguj</button></li>
             </ul>
         </aside>
+
         <main class="main-content">
-            <h1>Siema kierowco! 👋</h1>
-            <p>Zalogowany jako: <span id="user-info"></span></p>
+            <div class="welcome-box">
+                <h1>Cześć, <span id="user-display" style="color: #007acc;">Kierowco</span>!</h1>
+                <p>Witaj w panelu pracowniczym firmy VMPK. Wybierz odpowiednią opcję z menu po lewej stronie, aby zarządzać swoimi obowiązkami.</p>
+            </div>
         </main>
     </div>
+
     <script>
+        // Walidacja sesji
         const user = localStorage.getItem("nick");
-        if (!user) window.location.href = "index.html";
-        else document.getElementById("user-info").innerText = user;
+        if (!user) {
+            window.location.href = "index.html";
+        } else {
+            document.getElementById("user-display").innerText = user;
+        }
+
+        // Pokazywanie złotego przycisku dla adminów/szefów
+        if (user === "admin" || user === "Ksawery" || user === "Michał" || user === "Maciek") {
+            document.querySelector(".btn-admin").style.display = "flex";
+        }
+
+        // Tymczasowy komunikat dla nowych opcji
+        function otworzOpcje(nazwa) {
+            alert(`Opcja "${nazwa}" jest obecnie w przygotowaniu.`);
+        }
     </script>
 </body>
 </html>
