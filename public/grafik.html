@@ -89,13 +89,23 @@
 
         /* WYRÓŻNIENIE DLA SZEFÓW (Tylko komórka z nickiem Ksawery i Michał) */
         th.boss-header {
-            background-color: #1a2a40 !important; /* Ciemnoniebieskie tło pod sam nick */
-            color: #38b6ff !important;            /* Jaśniejszy błękit tekstu */
-            border-bottom: 2px solid #38b6ff;     /* Dodatkowe odcięcie na dole nicku */
+            background-color: #1a2a40 !important; 
+            color: #38b6ff !important;            
+            border-bottom: 2px solid #38b6ff;     
         }
 
-        /* Konstrukcja komórek służb */
-        .duty { display: block; background-color: #262626; padding: 5px 8px; border-radius: 4px; font-size: 11px; border: 1px solid #3a3a3a; color: #e0e0e0; margin: 2px auto; width: max-content; }
+        /* Stylizacja wyświetlanej służby */
+        .duty { 
+            display: inline-block; 
+            background-color: #007acc; 
+            padding: 4px 10px; 
+            border-radius: 4px; 
+            font-size: 12px; 
+            font-weight: bold;
+            color: #ffffff; 
+            border: 1px solid #005994;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
     </style>
 </head>
 <body>
@@ -126,39 +136,20 @@
     </div>
 
     <script>
-        // Sprawdzenie sesji użytkownika
         const user = localStorage.getItem("nick");
         if (!user) { window.location.href = "index.html"; } else { document.getElementById("user-info").innerText = user; }
 
-        // Uprawnienia administratora / dyspozytora (Maciek ma dostęp)
         if (user === "admin" || user === "Ksawery" || user === "Michał" || user === "Maciek") {
             document.querySelector(".btn-admin").style.display = "block";
         }
 
-        // Kompletna lista kierowców
         const kierowcy = [
-            "Ksawery (42069)",
-            "Michał (57137)",
-            "Adam (1111)",
-            "Adam (57771)",
-            "Damian (7902)",
-            "Dawid (50555)",
-            "Dominik (2712)",
-            "Elnur (47601)",
-            "Jakub (23801)",
-            "Jakub (37192)",
-            "Kamil (3617)",
-            "Maciek (5355)",
-            "Mikołaj (433)",
-            "Miłosz (65420)",
-            "Oskar (57123)",
-            "Sebastian (2347)",
-            "Szymon (78102)",
-            "Wojtek (57812)",
-            "Xawery (56459)"
+            "Ksawery (42069)", "Michał (57137)", "Adam (1111)", "Adam (57771)", "Damian (7902)",
+            "Dawid (50555)", "Dominik (2712)", "Elnur (47601)", "Jakub (23801)", "Jakub (37192)",
+            "Kamil (3617)", "Maciek (5355)", "Mikołaj (433)", "Miłosz (65420)", "Oskar (57123)",
+            "Sebastian (2347)", "Szymon (78102)", "Wojtek (57812)", "Xawery (56459)"
         ];
 
-        // Funkcja sprawdzająca kolor nagłówka – tylko Ksawery i Michał
         function czyToSzef(nazwaKierowcy) {
             return nazwaKierowcy.startsWith("Ksawery") || nazwaKierowcy.startsWith("Michał");
         }
@@ -166,17 +157,15 @@
         const nazwyMiesiecy = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
         const dniTygodnia = ["niedziela", "poniedziałek", "wtorek", "środa", "czwartek", "piątek", "sobota"];
 
-        let aktualnyMiesiac = -1;
-
         function generujGrafik() {
             const teraz = new Date();
             const rok = teraz.getFullYear();
             const miesiacIdx = teraz.getMonth();
 
-            if (miesiacIdx === aktualnyMiesiac) return;
-            aktualnyMiesiac = miesiacIdx;
-
             document.getElementById("dynamic-title").innerText = `GRAFIK VMPK KŁOSOK — ${nazwyMiesiecy[miesiacIdx]} ${rok}`;
+
+            // Pobieramy aktualne służby z bazy danych
+            const bazaGrafiku = JSON.parse(localStorage.getItem("baza_grafiku")) || {};
 
             const thead = document.getElementById("table-head");
             let headHtml = `<tr><th>Dzień miesiąca</th>`;
@@ -199,8 +188,16 @@
 
                 bodyHtml += `<tr${klasaWiersza}>`;
                 bodyHtml += `<td>${dzien} ${dniTygodnia[dzienTygodniaIdx]}</td>`;
-                kierowcy.forEach(() => {
-                    bodyHtml += `<td></td>`;
+                
+                kierowcy.forEach(kierowca => {
+                    // Szukamy zapisu w bazie dla danego kierowcy i dnia
+                    const klucz = `${kierowca}_${dzien}`;
+                    const sluzba = bazaGrafiku[klucz] || "";
+                    
+                    // Jeśli jest służba, opakowujemy ją w ładną plakietkę
+                    const wyswietlanyWpis = sluzba ? `<span class="duty">${sluzba}</span>` : "";
+                    
+                    bodyHtml += `<td>${wyswietlanyWpis}</td>`;
                 });
                 bodyHtml += `</tr>`;
             }
@@ -208,6 +205,7 @@
         }
 
         generujGrafik();
+        // Odświeżanie co 10 sekund, by na bieżąco łapać zmiany wprowadzone przez dyspozytora
         setInterval(generujGrafik, 10000);
     </script>
 </body>
