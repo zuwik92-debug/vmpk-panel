@@ -87,17 +87,11 @@
         .weekend td:first-child { color: #ff4d4d; }
         .weekend td { background-color: #1a1515; }
 
-        /* WYRÓŻNIENIE DLA SZEFÓW (Kolor tła nagłówka i kolumny) */
-        th.boss-column {
-            background-color: #132237 !important; /* Elegancki, ciemnoniebieski nagłówek */
-            color: #38b6ff !important;
-        }
-        td.boss-cell {
-            background-color: #111a26 !important; /* Subtelne ciemnoniebieskie tło kolumny */
-        }
-        /* Hover na wierszu zachowujący wyróżnienie szefa */
-        tr:hover td.boss-cell {
-            background-color: #162436 !important;
+        /* WYRÓŻNIENIE WYŁĄCZNIE DLA NICKÓW SZEFÓW (Tylko komórka nagłówka TH) */
+        th.boss-header {
+            background-color: #1a2a40 !important; /* Ciemnoniebieskie tło pod sam nick */
+            color: #38b6ff !important;            /* Jaśniejszy błękit tekstu */
+            border-bottom: 2px solid #38b6ff;     /* Dodatkowe odcięcie na dole nicku */
         }
 
         /* Konstrukcja komórek służb */
@@ -187,7 +181,8 @@
             const thead = document.getElementById("table-head");
             let headHtml = `<tr><th>Dzień miesiąca</th>`;
             kierowcy.forEach(kierowca => {
-                const klasaSzefa = czyToSzef(kierowca) ? ' class="boss-column"' : '';
+                // Kolorujemy tylko nagłówek (th), jeśli to szef
+                const klasaSzefa = czyToSzef(kierowca) ? ' class="boss-header"' : '';
                 headHtml += `<th${klasaSzefa}>${kierowca}</th>`;
             });
             headHtml += `</tr>`;
@@ -205,9 +200,9 @@
 
                 bodyHtml += `<tr${klasaWiersza}>`;
                 bodyHtml += `<td>${dzien} ${dniTygodnia[dzienTygodniaIdx]}</td>`;
-                kierowcy.forEach(kierowca => {
-                    const klasaKomorkiSzefa = czyToSzef(kierowca) ? ' class="boss-cell"' : '';
-                    bodyHtml += `<td${klasaKomorkiSzefa}></td>`;
+                kierowcy.forEach(() => {
+                    // Komórki pod spodem mają zwykły styl, bez zmian tła
+                    bodyHtml += `<td></td>`;
                 });
                 bodyHtml += `</tr>`;
             }
