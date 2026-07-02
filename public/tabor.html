@@ -48,11 +48,12 @@
             <ul class="menu-list">
                 <li class="menu-item"><button onclick="window.location.href='panel.html'">🏠 Strona główna</button></li>
                 <li class="menu-item"><button onclick="window.location.href='grafik.html'">📅 Grafik</button></li>
-                
                 <li class="menu-item"><button class="active" onclick="window.location.reload()">🚌 Tabor</button></li>
                 <li class="menu-item"><button onclick="otworzOpcje('GODZINY ZMIAN')">⏱️ Godziny zmian</button></li>
-                <li class="menu-item"><button onclick="otworzOpcje('SKLEP')">🛒 Sklep</button></li>
-                <li class="menu-item"><button onclick="otworbOpcje('RAPORTY')">📊 Raporty</button></li>
+                
+                <!-- Poprawione przekierowanie do sklepu -->
+                <li class="menu-item"><button onclick="window.location.href='sklep.html'">🛒 Sklep</button></li>
+                <li class="menu-item"><button onclick="otworzOpcje('RAPORTY')">📊 Raporty</button></li>
                 <li class="menu-item"><button onclick="otworzOpcje('ZGŁOSZENIA')">⚠️ Zgłoszenia</button></li>
                 <li class="menu-item"><button onclick="otworzOpcje('WNIOSKI')">📝 Wnioski</button></li>
                 
@@ -68,9 +69,7 @@
                 <p>Pełna lista autobusów znajdujących się na stanie przedsiębiorstwa.</p>
             </div>
 
-            <div class="tabor-grid" id="tabor-container">
-                <!-- Tutaj wpadną autobusy ze skryptu -->
-            </div>
+            <div class="tabor-grid" id="tabor-container"></div>
         </main>
     </div>
 
@@ -86,7 +85,6 @@
             alert(`Opcja "${nazwa}" jest obecnie w przygotowaniu.`);
         }
 
-        // Zaktualizowana lista autobusów Solaris Urbino III
         const autobusy = [
             { nr: "001", model: "Solaris Urbino III 18m ACTIA E6" },
             { nr: "003", model: "Solaris Urbino III 18m MOKI E6 (SOBOL) / ACTIA E6 (MEGAPACK)" },
