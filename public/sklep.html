@@ -27,26 +27,30 @@
         .main-content { flex-grow: 1; background-color: #0c0c0c; display: flex; flex-direction: column; overflow: hidden; }
         
         /* Górny panel informacyjny */
-        .top-badge-bar { background-color: #080808; width: 100%; padding: 15px; display: flex; justify-content: center; align-items: center; gap: 5px; border-bottom: 1px solid #1a1a1a; }
-        .badge { padding: 6px 14px; font-weight: bold; font-size: 13px; border-radius: 4px; }
+        .top-badge-bar { background-color: #080808; width: 100%; padding: 15px; display: flex; justify-content: center; align-items: center; gap: 8px; border-bottom: 1px solid #1a1a1a; }
+        .badge { padding: 6px 14px; font-weight: bold; font-size: 13px; border-radius: 4px; text-align: center; min-width: 60px; }
         .badge-blue { background-color: #007acc; color: #fff; }
         .badge-gray { background-color: #3a3a3a; color: #ccc; }
         .badge-green { background-color: #008000; color: #fff; }
 
         /* Wewnętrzny kontener sklepu */
-        .shop-wrapper { padding: 25px; display: flex; flex-direction: column; gap: 25px; flex-grow: 1; overflow-y: auto; }
+        .shop-wrapper { padding: 25px; display: flex; flex-direction: column; gap: 20px; flex-grow: 1; overflow-y: auto; }
         
-        .shop-title-bar { background-color: #161616; border: 1px solid #222; padding: 12px 20px; border-radius: 4px; font-size: 14px; font-weight: bold; color: #fff; text-transform: capitalize; }
+        .shop-title-bar { background-color: #161616; border: 1px solid #222; padding: 12px 20px; border-radius: 4px; font-size: 14px; font-weight: bold; color: #fff; }
 
-        /* Siatka kategorii oparta na przesłanym wzorze graficznym */
-        .category-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px; }
+        /* Siatka kategorii */
+        .category-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
         
         .category-card { position: relative; height: 320px; border: 1px solid #222; border-radius: 4px; overflow: hidden; cursor: pointer; background-size: cover; background-position: center; transition: transform 0.2s, border-color 0.2s; }
-        .category-card:hover { transform: translateY(-2px); border-color: #ff9800; }
+        .category-card:hover { transform: translateY(-2px); border-color: #007acc; }
+        
+        /* Obsługa kafelków, gdy pliki graficzne są lokalne */
+        .card-maps { background-image: url('mapa_tlo.png'); background-color: #1a1a1a; }
+        .card-vehicles { background-image: url('pojazdy_tlo.jpg'); background-color: #1a1a1a; }
         
         /* Czerwony pas na dole kafelek */
-        .category-info-bar { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(204, 24, 24, 0.85); padding: 18px 20px; display: flex; align-items: center; height: 80px; }
-        .category-title { font-size: 36px; font-weight: bold; color: #ffcc00; text-shadow: 2px 2px 4px rgba(0,0,0,0.6); letter-spacing: 0.5px; }
+        .category-info-bar { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(163, 18, 18, 0.9); padding: 15px 20px; display: flex; align-items: center; height: 75px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .category-title { font-size: 32px; font-weight: bold; color: #ffcc00; text-shadow: 2px 2px 3px rgba(0,0,0,0.8); letter-spacing: 0.5px; }
     </style>
 </head>
 <body>
@@ -82,13 +86,13 @@
                 
                 <div class="category-grid">
                     
-                    <div class="category-card" style="background-image: url('mapa_tlo.png');" onclick="otworzKategorie('Mapy')">
+                    <div class="category-card card-maps" id="card-maps-el" onclick="otworzKategorie('Mapy')">
                         <div class="category-info-bar">
                             <div class="category-title">Mapy</div>
                         </div>
                     </div>
 
-                    <div class="category-card" style="background-image: url('pojazdy_tlo.jpg');" onclick="otworzKategorie('Pojazdy')">
+                    <div class="category-card card-vehicles" id="card-vehicles-el" onclick="otworzKategorie('Pojazdy')">
                         <div class="category-info-bar">
                             <div class="category-title">Pojazdy</div>
                         </div>
@@ -107,9 +111,8 @@
             document.querySelector(".btn-admin").style.display = "flex";
         }
 
-        // --- PROFILE PUNKTÓW ---
+        // System punktowy zsynchronizowany z bazą danych
         let punktyKlucz = `punkty_${user}`;
-        
         if (user === "admin") {
             localStorage.setItem(punktyKlucz, "10000");
         } else {
@@ -118,7 +121,6 @@
             }
         }
 
-        // Podpięcie danych pod górne plakietki
         document.getElementById("user-badge").innerText = user;
         document.getElementById("points-badge").innerText = `${localStorage.getItem(punktyKlucz)} PKT`;
 
