@@ -10,13 +10,15 @@
         
         .app-container { display: flex; height: 100vh; }
         
-        /* Panel boczny */
-        .sidebar { width: 260px; background-color: #161616; padding: 30px 20px; display: flex; flex-direction: column; gap: 30px; border-right: 1px solid #222; flex-shrink: 0; }
+        /* Panel boczny z zachowaniem pełnej listy */
+        .sidebar { width: 260px; background-color: #161616; padding: 30px 20px; display: flex; flex-direction: column; gap: 30px; border-right: 1px solid #222; flex-shrink: 0; overflow-y: auto; }
+        .sidebar h2 { font-size: 26px; font-weight: bold; color: #fff; letter-spacing: 1px; }
         .menu-list { display: flex; flex-direction: column; gap: 12px; list-style: none; }
-        .menu-item button { width: 100%; background-color: #2a2a2a; color: #fff; border: none; padding: 12px 15px; text-align: left; border-radius: 4px; cursor: pointer; font-size: 14px; }
-        .menu-item button:hover, .menu-item button.active { background-color: #3a3a3a; border-left: 4px solid #007acc; padding-left: 11px; }
+        .menu-item button { width: 100%; background-color: #2a2a2a; color: #fff; border: none; padding: 12px 15px; text-align: left; border-radius: 4px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 10px; transition: background 0.2s; }
+        .menu-item button:hover { background-color: #333; }
+        .menu-item button.active { background-color: #3a3a3a; border-left: 4px solid #007acc; padding-left: 11px; }
         
-        /* Przycisk panelu administracyjnego / dyspozytora */
+        /* Złoty przycisk dyspozytora ukryty domyślnie, aktywowany skryptem */
         .btn-admin { border-left: 4px solid #ff9800 !important; background-color: #2e2416 !important; color: #ff9800 !important; display: none; }
         .btn-admin:hover { background-color: #42331f !important; }
         
@@ -29,83 +31,21 @@
         .header-section h1 { font-size: 24px; margin-bottom: 5px; color: #fff; text-transform: uppercase; }
         .header-section p { color: #888; font-size: 14px; }
 
-        /* Kontener tabeli z przewijaniem */
+        /* Kontener tabeli */
         .table-container { flex-grow: 1; overflow: auto; background-color: #161616; border: 1px solid #222; border-radius: 6px; }
-        
-        /* Styl tabeli grafiku */
         table { border-collapse: collapse; width: 100%; text-align: center; font-size: 13px; table-layout: auto; }
         
-        /* Nagłówki (Kierowcy) */
-        th { 
-            background-color: #1f1f1f; 
-            color: #007acc; 
-            font-weight: bold; 
-            padding: 14px 12px; 
-            border: 1px solid #2a2a2a; 
-            position: sticky; 
-            top: 0; 
-            z-index: 2; 
-            white-space: nowrap; 
-            min-width: 150px;    
-        }
-        
-        th:first-child { 
-            position: sticky; 
-            left: 0; 
-            background-color: #1f1f1f; 
-            z-index: 3; 
-            color: #fff; 
-            width: 160px; 
-            min-width: 160px;
-        }
-
-        /* Wiersze (Dni i komórki na służby) */
-        td { 
-            padding: 10px; 
-            border: 1px solid #2a2a2a; 
-            background-color: #161616; 
-            color: #ccc; 
-            height: 48px; 
-            white-space: nowrap; 
-        }
+        th { background-color: #1f1f1f; color: #007acc; font-weight: bold; padding: 14px 12px; border: 1px solid #2a2a2a; position: sticky; top: 0; z-index: 2; white-space: nowrap; min-width: 150px; }
+        th:first-child { position: sticky; left: 0; background-color: #1f1f1f; z-index: 3; color: #fff; width: 160px; min-width: 160px; }
+        td { padding: 10px; border: 1px solid #2a2a2a; background-color: #161616; color: #ccc; height: 48px; white-space: nowrap; }
         tr:hover td { background-color: #1c1c1c; }
-        
-        /* Pierwsza kolumna (Dni miesiąca) */
-        td:first-child { 
-            position: sticky; 
-            left: 0; 
-            background-color: #1a1a1a; 
-            font-weight: bold; 
-            color: #fff; 
-            text-align: left; 
-            padding-left: 15px; 
-            border-right: 2px solid #2a2a2a; 
-            z-index: 1;
-        }
+        td:first-child { position: sticky; left: 0; background-color: #1a1a1a; font-weight: bold; color: #fff; text-align: left; padding-left: 15px; border-right: 2px solid #2a2a2a; z-index: 1; }
 
-        /* Weekend wyróżniony na czerwono */
         .weekend td:first-child { color: #ff4d4d; }
         .weekend td { background-color: #1a1515; }
 
-        /* WYRÓŻNIENIE DLA SZEFÓW (Tylko komórka z nickiem Ksawery i Michał) */
-        th.boss-header {
-            background-color: #1a2a40 !important; 
-            color: #38b6ff !important;            
-            border-bottom: 2px solid #38b6ff;     
-        }
-
-        /* Stylizacja wyświetlanej służby */
-        .duty { 
-            display: inline-block; 
-            background-color: #007acc; 
-            padding: 4px 10px; 
-            border-radius: 4px; 
-            font-size: 12px; 
-            font-weight: bold;
-            color: #ffffff; 
-            border: 1px solid #005994;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
+        th.boss-header { background-color: #1a2a40 !important; color: #38b6ff !important; border-bottom: 2px solid #38b6ff; }
+        .duty { display: inline-block; background-color: #007acc; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; color: #ffffff; border: 1px solid #005994; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -115,7 +55,17 @@
             <ul class="menu-list">
                 <li class="menu-item"><button onclick="window.location.href='panel.html'">🏠 Strona główna</button></li>
                 <li class="menu-item"><button class="active" onclick="window.location.reload()">📅 Grafik</button></li>
+                
+                <li class="menu-item"><button onclick="otworzOpcje('TABOR')">🚌 Tabor</button></li>
+                <li class="menu-item"><button onclick="otworzOpcje('GODZINY ZMIAN')">⏱️ Godziny zmian</button></li>
+                <li class="menu-item"><button onclick="otworzOpcje('SKLEP')">🛒 Sklep</button></li>
+                <li class="menu-item"><button onclick="otworzOpcje('RAPORTY')">📊 Raporty</button></li>
+                <li class="menu-item"><button onclick="otworzOpcje('ZGŁOSZENIA')">⚠️ Zgłoszenia</button></li>
+                <li class="menu-item"><button onclick="otworzOpcje('WNIOSKI')">📝 Wnioski</button></li>
+                
+                <!-- TUTAJ POJAWI SIĘ PRZYCISK ZARZĄDZANIA (TYLKO DLA UPRAWNIONYCH) -->
                 <li class="menu-item" id="admin-menu-item"><button class="btn-admin" onclick="window.location.href='zarzadzaj.html'">✍️ Zarządzaj grafikiem</button></li>
+                
                 <li class="menu-item"><button class="btn-logout" onclick="localStorage.removeItem('nick'); window.location.href='index.html'">🚪 Wyloguj</button></li>
             </ul>
         </aside>
@@ -139,8 +89,13 @@
         const user = localStorage.getItem("nick");
         if (!user) { window.location.href = "index.html"; } else { document.getElementById("user-info").innerText = user; }
 
+        // Warunek sprawdzający uprawnienia po wejściu do Grafiku
         if (user === "admin" || user === "Ksawery" || user === "Michał" || user === "Maciek") {
-            document.querySelector(".btn-admin").style.display = "block";
+            document.querySelector(".btn-admin").style.display = "flex";
+        }
+
+        function otworzOpcje(nazwa) {
+            alert(`Opcja "${nazwa}" jest obecnie w przygotowaniu.`);
         }
 
         const kierowcy = [
@@ -164,7 +119,6 @@
 
             document.getElementById("dynamic-title").innerText = `GRAFIK VMPK KŁOSOK — ${nazwyMiesiecy[miesiacIdx]} ${rok}`;
 
-            // Pobieramy aktualne służby z bazy danych
             const bazaGrafiku = JSON.parse(localStorage.getItem("baza_grafiku")) || {};
 
             const thead = document.getElementById("table-head");
@@ -190,13 +144,9 @@
                 bodyHtml += `<td>${dzien} ${dniTygodnia[dzienTygodniaIdx]}</td>`;
                 
                 kierowcy.forEach(kierowca => {
-                    // Szukamy zapisu w bazie dla danego kierowcy i dnia
                     const klucz = `${kierowca}_${dzien}`;
                     const sluzba = bazaGrafiku[klucz] || "";
-                    
-                    // Jeśli jest służba, opakowujemy ją w ładną plakietkę
                     const wyswietlanyWpis = sluzba ? `<span class="duty">${sluzba}</span>` : "";
-                    
                     bodyHtml += `<td>${wyswietlanyWpis}</td>`;
                 });
                 bodyHtml += `</tr>`;
@@ -205,7 +155,6 @@
         }
 
         generujGrafik();
-        // Odświeżanie co 10 sekund, by na bieżąco łapać zmiany wprowadzone przez dyspozytora
         setInterval(generujGrafik, 10000);
     </script>
 </body>
