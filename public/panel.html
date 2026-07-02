@@ -18,10 +18,6 @@
         .menu-item button:hover { background-color: #333; }
         .menu-item button.active { background-color: #3a3a3a; border-left: 4px solid #007acc; padding-left: 11px; }
         
-        /* Specjalny przycisk zarzadzania grafikiem dla szefow */
-        .btn-admin { border-left: 4px solid #ff9800 !important; background-color: #2e2416 !important; color: #ff9800 !important; display: none; }
-        .btn-admin:hover { background-color: #42331f !important; }
-        
         .btn-logout { background-color: #4a2323 !important; }
         .btn-logout:hover { background-color: #632d2d !important; }
 
@@ -40,16 +36,12 @@
                 <li class="menu-item"><button class="active" onclick="window.location.reload()">🏠 Strona główna</button></li>
                 <li class="menu-item"><button onclick="window.location.href='grafik.html'">📅 Grafik</button></li>
                 
-                <!-- NOWE ZAKŁADKI DODANE DO MENU BOCZNEGO -->
                 <li class="menu-item"><button onclick="otworzOpcje('TABOR')">🚌 Tabor</button></li>
                 <li class="menu-item"><button onclick="otworzOpcje('GODZINY ZMIAN')">⏱️ Godziny zmian</button></li>
                 <li class="menu-item"><button onclick="otworzOpcje('SKLEP')">🛒 Sklep</button></li>
                 <li class="menu-item"><button onclick="otworzOpcje('RAPORTY')">📊 Raporty</button></li>
                 <li class="menu-item"><button onclick="otworzOpcje('ZGŁOSZENIA')">⚠️ Zgłoszenia</button></li>
                 <li class="menu-item"><button onclick="otworzOpcje('WNIOSKI')">📝 Wnioski</button></li>
-                
-                <!-- Przycisk widoczny tylko dla uprawnionych -->
-                <li class="menu-item" id="admin-menu-item"><button class="btn-admin" onclick="window.location.href='zarzadzaj.html'">✍️ Zarządzaj grafikiem</button></li>
                 
                 <li class="menu-item"><button class="btn-logout" onclick="localStorage.removeItem('nick'); window.location.href='index.html'">🚪 Wyloguj</button></li>
             </ul>
@@ -58,26 +50,15 @@
         <main class="main-content">
             <div class="welcome-box">
                 <h1>Cześć, <span id="user-display" style="color: #007acc;">Kierowco</span>!</h1>
-                <p>Witaj w panelu pracowniczym firmy VMPK. Wybierz odpowiednią opcję z menu po lewej stronie, aby zarządzać swoimi obowiązkami.</p>
+                <p>Witaj w panelu pracowniczym VMPK Kłosok. Wybierz odpowiednią opcję z menu po lewej stronie, aby zarządzać swoimi obowiązkami.</p>
             </div>
         </main>
     </div>
 
     <script>
-        // Walidacja sesji
         const user = localStorage.getItem("nick");
-        if (!user) {
-            window.location.href = "index.html";
-        } else {
-            document.getElementById("user-display").innerText = user;
-        }
+        if (!user) { window.location.href = "index.html"; } else { document.getElementById("user-display").innerText = user; }
 
-        // Pokazywanie złotego przycisku dla adminów/szefów
-        if (user === "admin" || user === "Ksawery" || user === "Michał" || user === "Maciek") {
-            document.querySelector(".btn-admin").style.display = "flex";
-        }
-
-        // Tymczasowy komunikat dla nowych opcji
         function otworzOpcje(nazwa) {
             alert(`Opcja "${nazwa}" jest obecnie w przygotowaniu.`);
         }
