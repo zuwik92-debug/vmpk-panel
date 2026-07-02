@@ -10,7 +10,7 @@
         
         .app-container { display: flex; height: 100vh; }
         
-        /* Panel boczny - taki sam jak w innych plikach */
+        /* Panel boczny */
         .sidebar { width: 260px; background-color: #161616; padding: 30px 20px; display: flex; flex-direction: column; gap: 30px; border-right: 1px solid #222; flex-shrink: 0; overflow-y: auto; }
         .sidebar h2 { font-size: 26px; font-weight: bold; color: #fff; letter-spacing: 1px; }
         .menu-list { display: flex; flex-direction: column; gap: 12px; list-style: none; }
@@ -29,10 +29,9 @@
         .header-section h1 { font-size: 24px; text-transform: uppercase; margin-bottom: 5px; }
         .header-section p { color: #888; font-size: 14px; }
 
-        /* Siatka z kartami autobusów */
+        /* Siatka kart */
         .tabor-grid { flex-grow: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding-bottom: 20px; }
         
-        /* Styl karty pojazdu */
         .bus-card { background: #161616; border: 1px solid #222; border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 12px; transition: transform 0.2s, border-color 0.2s; }
         .bus-card:hover { transform: translateY(-3px); border-color: #333; }
         
@@ -40,7 +39,6 @@
         .bus-number { font-size: 20px; font-weight: bold; color: #ff9800; }
         .bus-status { font-size: 11px; padding: 3px 8px; border-radius: 20px; font-weight: bold; text-transform: uppercase; }
         
-        /* Statusy pojazdów */
         .status-ready { background-color: #1b4332; color: #52b788; border: 1px solid #2d6a4f; }
         .status-line { background-color: #1a2a40; color: #38b6ff; border: 1px solid #007acc; }
         .status-repair { background-color: #4a2323; color: #ff4d4d; border: 1px solid #632d2d; }
@@ -57,7 +55,6 @@
                 <li class="menu-item"><button onclick="window.location.href='panel.html'">🏠 Strona główna</button></li>
                 <li class="menu-item"><button onclick="window.location.href='grafik.html'">📅 Grafik</button></li>
                 
-                <!-- Aktywna zakładka taboru -->
                 <li class="menu-item"><button class="active" onclick="window.location.reload()">🚌 Tabor</button></li>
                 <li class="menu-item"><button onclick="otworzOpcje('GODZINY ZMIAN')">⏱️ Godziny zmian</button></li>
                 <li class="menu-item"><button onclick="otworzOpcje('SKLEP')">🛒 Sklep</button></li>
@@ -77,10 +74,7 @@
                 <p>Przeglądaj dostępne autobusy miejskie oraz ich aktualny status operacyjny.</p>
             </div>
 
-            <!-- Kontener z kartami autobusów -->
-            <div class="tabor-grid" id="tabor-container">
-                <!-- Pojazdy generują się automatycznie ze skryptu poniżej -->
-            </div>
+            <div class="tabor-grid" id="tabor-container"></div>
         </main>
     </div>
 
@@ -96,7 +90,6 @@
             alert(`Opcja "${nazwa}" jest obecnie w przygotowaniu.`);
         }
 
-        // Statyczna baza taboru (Można ją potem rozbudować)
         const autobusy = [
             { nr: "101", model: "Solaris Urbino 12 IV", stan: "Sprawny", status: "W zajezdni", klasa: "status-ready" },
             { nr: "102", model: "Solaris Urbino 12 IV", stan: "Sprawny", status: "Na linii (1/265)", klasa: "status-line" },
