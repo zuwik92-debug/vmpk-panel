@@ -3,169 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logowanie do panelu - VMPK</title>
+    <title>Logowanie do panelu - vMZA</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         
-        body { 
-            height: 100vh; 
-            width: 100vw; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            background-color: #0c0c0c; /* Kolor awaryjny, gdyby zdjęcie zniknęło */
-            
-            /* Zmień nazwę pliku graficznego na tlo.png w swoim folderze */
-            background-image: url("tlo.png") !important;
-            background-repeat: no-repeat !important;
-            background-position: center center !important;
-            background-size: cover !important;
-            background-attachment: fixed !important;
+        body, html {
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Ustawiono nazwę tlo.png */
+            background-image: url('/tlo.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
 
+        /* Przyciemnienie tła pod formularzem */
+        .overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1;
+        }
+
+        /* Boks logowania */
         .login-box {
-            background: rgba(22, 22, 22, 0.9);
-            backdrop-filter: blur(8px);
+            position: relative;
+            z-index: 2;
+            background: rgba(26, 26, 26, 0.92);
             padding: 40px;
             border-radius: 8px;
-            border: 1px solid #333;
             width: 100%;
-            max-width: 420px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             text-align: center;
         }
 
-        h2 { margin-bottom: 25px; font-weight: 600; color: #fff; letter-spacing: 0.5px; }
-        
-        .input-group { margin-bottom: 20px; text-align: left; }
-        .input-group label { display: block; color: #aaa; font-size: 12px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; }
-        .input-group input { 
-            width: 100%; padding: 12px; background: #1f1f1f; border: 1px solid #3a3a3a; 
-            color: #fff; border-radius: 4px; font-size: 14px; outline: none; transition: border 0.2s;
+        .login-box h2 {
+            color: #fff;
+            margin-bottom: 25px;
+            font-size: 22px;
+            font-weight: 600;
         }
-        .input-group input:focus { border-color: #007acc; }
 
-        .btn-submit { 
-            width: 100%; padding: 14px; background: #007acc; color: #fff; border: none; 
-            border-radius: 4px; font-weight: bold; font-size: 14px; cursor: pointer; 
-            transition: background 0.2s; text-transform: uppercase; margin-top: 10px;
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
         }
-        .btn-submit:hover { background: #0062a3; }
 
-        .error-msg { color: #ff4d4d; font-size: 13px; margin-top: 15px; display: none; }
+        .input-group label {
+            display: block;
+            color: #aaa;
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
 
-        /* Widok zmiany hasła */
-        #change-password-view { display: none; }
-        .info-alert { background: #2e2416; border-left: 4px solid #ff9800; color: #ff9800; padding: 12px; text-align: left; font-size: 13px; border-radius: 4px; margin-bottom: 20px; }
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-group input:focus {
+            border-color: #007acc;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background-color: #007acc;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover {
+            background-color: #005994;
+        }
     </style>
 </head>
 <body>
+    <div class="overlay"></div>
 
     <div class="login-box">
-        <div id="login-view">
-            <h2>Logowanie do panelu</h2>
+        <h2>Logowanie do panelu</h2>
+        <form onsubmit="zaloguj(event)">
             <div class="input-group">
                 <label>Nick</label>
-                <input type="text" id="login-nick" placeholder="Wpisz swój nick">
+                <input type="text" id="nick" placeholder="Wpisz nick..." required autocomplete="off">
             </div>
             <div class="input-group">
                 <label>Hasło</label>
-                <input type="password" id="login-pass" placeholder="••••">
+                <input type="password" id="haslo" placeholder="••••••••" required>
             </div>
-            <button class="btn-submit" onclick="obslugaLogowania()">Zaloguj się</button>
-            <div class="error-msg" id="login-error">Niepoprawny nick lub hasło!</div>
-        </div>
-
-        <div id="change-password-view">
-            <h2>Zmień hasło startowe</h2>
-            <div class="info-alert">
-                <strong>Wymagana zmiana!</strong> To Twoje pierwsze logowanie. Musisz ustawić bezpieczne hasło dostępu.
-            </div>
-            <div class="input-group">
-                <label>Nowe hasło</label>
-                <input type="password" id="new-pass" placeholder="Minimum 5 znaków">
-            </div>
-            <div class="input-group">
-                <label>Powtórz nowe hasło</label>
-                <input type="password" id="confirm-pass" placeholder="••••">
-            </div>
-            <button class="btn-submit" style="background: #ff9800;" onclick="zapiszNoweHaslo()">Zatwierdź i przejdź do panelu</button>
-            <div class="error-msg" id="change-error">Hasła nie są identyczne!</div>
-        </div>
+            <button type="submit" class="btn-login">ZALOGUJ SIĘ</button>
+        </form>
     </div>
 
     <script>
-        const listaKierowcow = [
-            "Ksawery", "Michał", "Adam", "Damian", "Dawid", 
-            "Dominik", "Elnur", "Jakub", "Kamil", "Maciek", 
-            "Mikołaj", "Miłosz", "Oskar", "Sebastian", "Szymon", "Wojtek", "Xawery"
-        ];
-
-        if (!localStorage.getItem("baza_uzytkownikow")) {
-            const db = {
-                "admin": { haslo: "admin", wymagaZmiany: false }
-            };
-            
-            listaKierowcow.forEach(k => {
-                db[k] = { haslo: "Klosok2026!", wymagaZmiany: true };
-            });
-            
-            localStorage.setItem("baza_uzytkownikow", JSON.stringify(db));
-        }
-
-        let tymczasowoZalogowanyUzytkownik = "";
-
-        function obslugaLogowania() {
-            const nick = document.getElementById("login-nick").value.trim();
-            const pass = document.getElementById("login-pass").value;
-            const errorDiv = document.getElementById("login-error");
-            
-            const db = JSON.parse(localStorage.getItem("baza_uzytkownikow"));
-            
-            errorDiv.style.display = "none";
-
-            if (db[nick] && db[nick].haslo === pass) {
-                if (db[nick].wymagaZmiany) {
-                    tymczasowoZalogowanyUzytkownik = nick;
-                    document.getElementById("login-view").style.display = "none";
-                    document.getElementById("change-password-view").style.display = "block";
-                } else {
-                    localStorage.setItem("nick", nick);
-                    window.location.href = "panel.html";
-                }
-            } else {
-                errorDiv.style.display = "block";
-                errorDiv.innerText = "Niepoprawny nick lub hasło!";
+        function zaloguj(event) {
+            event.preventDefault();
+            const nick = document.getElementById("nick").value.trim();
+            if (nick) {
+                localStorage.setItem("nick", nick);
+                window.location.href = "panel.html";
             }
-        }
-
-        function zapiszNoweHaslo() {
-            const newPass = document.getElementById("new-pass").value;
-            const confirmPass = document.getElementById("confirm-pass").value;
-            const changeError = document.getElementById("change-error");
-
-            changeError.style.display = "none";
-
-            if (newPass.length < 5) {
-                changeError.style.display = "block";
-                changeError.innerText = "Nowe hasło musi mieć minimum 5 znaków!";
-                return;
-            }
-
-            if (newPass !== confirmPass) {
-                changeError.style.display = "block";
-                changeError.innerText = "Podane hasła nie są identyczne!";
-                return;
-            }
-
-            const db = JSON.parse(localStorage.getItem("baza_uzytkownikow"));
-            db[tymczasowoZalogowanyUzytkownik].haslo = newPass;
-            db[tymczasowoZalogowanyUzytkownik].wymagaZmiany = false;
-            
-            localStorage.setItem("baza_uzytkownikow", JSON.stringify(db));
-
-            localStorage.setItem("nick", tymczasowoZalogowanyUzytkownik);
-            window.location.href = "panel.html";
         }
     </script>
 </body>
